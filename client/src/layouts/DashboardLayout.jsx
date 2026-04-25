@@ -5,7 +5,7 @@ import { useUser } from '../context/UserContext';
 import {
   FiHome, FiMap, FiCheckSquare, FiCalendar, FiMessageCircle,
   FiMapPin, FiPlay, FiBookOpen, FiLogOut, FiMenu, FiX,
-  FiCpu, FiCloud, FiWifiOff, FiChevronLeft
+  FiCloud, FiWifiOff, FiGlobe
 } from 'react-icons/fi';
 
 const NAV_ITEMS = [
@@ -15,6 +15,8 @@ const NAV_ITEMS = [
   { path: '/dashboard/timeline', icon: FiCalendar, label: 'Timeline' },
   { path: '/dashboard/chat', icon: FiMessageCircle, label: 'AI Chat' },
   { path: '/dashboard/booth', icon: FiMapPin, label: 'Booth Guide' },
+  { path: '/dashboard/eci-map', icon: FiGlobe, label: 'ECI Map' },
+  { path: '/dashboard/parliament', icon: FiHome, label: 'Parliament', iconEmoji: '🏛️' },
   { path: '/dashboard/scenarios', icon: FiPlay, label: 'Scenarios' },
   { path: '/dashboard/quiz', icon: FiBookOpen, label: 'Learn & Quiz' },
 ];
@@ -40,21 +42,12 @@ export default function DashboardLayout() {
   );
 
   const getAIBadge = () => {
-    if (aiStatus.activeProvider === 'ollama') {
-      return (
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <FiCpu size={12} className="text-emerald-400" />
-          <span className="text-xs font-semibold text-emerald-400">Local AI</span>
-        </div>
-      );
-    }
     if (aiStatus.activeProvider === 'gemini') {
       return (
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-violet-500/10 border border-violet-500/20">
           <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
           <FiCloud size={12} className="text-violet-400" />
-          <span className="text-xs font-semibold text-violet-400">Cloud AI</span>
+          <span className="text-xs font-semibold text-violet-400">Gemini AI</span>
         </div>
       );
     }
@@ -86,7 +79,7 @@ export default function DashboardLayout() {
 
         {/* Navigation */}
         <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-          {NAV_ITEMS.map(({ path, icon: Icon, label, end }) => (
+          {NAV_ITEMS.map(({ path, icon: Icon, label, end, iconEmoji }) => (
             <NavLink key={path} to={path} end={end}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
@@ -100,7 +93,7 @@ export default function DashboardLayout() {
                   <div className={`p-1.5 rounded-lg transition-colors ${
                     isActive ? 'bg-primary/20' : 'bg-transparent group-hover:bg-bg-elevated'
                   }`}>
-                    <Icon size={16} />
+                    {iconEmoji ? <span className="text-sm">{iconEmoji}</span> : <Icon size={16} />}
                   </div>
                   <span>{label}</span>
                   {isActive && (
@@ -125,7 +118,7 @@ export default function DashboardLayout() {
             </div>
             <button onClick={handleLogout}
               className="p-1.5 rounded-lg text-text-muted hover:text-accent hover:bg-accent/10 transition-colors"
-              title="Start Over">
+              title="Logout">
               <FiLogOut size={14} />
             </button>
           </div>
@@ -209,7 +202,7 @@ export default function DashboardLayout() {
 
               {/* Mobile Nav */}
               <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-                {NAV_ITEMS.map(({ path, icon: Icon, label, end }) => (
+                {NAV_ITEMS.map(({ path, icon: Icon, label, end, iconEmoji }) => (
                   <NavLink key={path} to={path} end={end}
                     onClick={() => setSidebarOpen(false)}
                     className={({ isActive }) =>
@@ -219,7 +212,7 @@ export default function DashboardLayout() {
                           : 'text-text-secondary hover:bg-bg-elevated hover:text-text-primary'
                       }`
                     }>
-                    <Icon size={18} />
+                    {iconEmoji ? <span className="text-lg">{iconEmoji}</span> : <Icon size={18} />}
                     <span>{label}</span>
                   </NavLink>
                 ))}

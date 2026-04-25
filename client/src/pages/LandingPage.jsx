@@ -8,7 +8,7 @@ export default function LandingPage() {
   const features = [
     { icon: <FiZap />, title: 'Personalized Journey', desc: 'AI creates YOUR unique voting roadmap', gradient: 'from-violet-500 to-indigo-500' },
     { icon: <FiCheckCircle />, title: 'Smart Checklist', desc: 'Track every step to election day', gradient: 'from-emerald-500 to-teal-500' },
-    { icon: <FiCpu />, title: 'Hybrid AI', desc: 'Local Ollama + Cloud Gemini fallback', gradient: 'from-blue-500 to-cyan-500' },
+    { icon: <FiCpu />, title: 'Gemini AI', desc: 'Powered by Google Gemini for smart answers', gradient: 'from-blue-500 to-cyan-500' },
     { icon: <FiShield />, title: 'Neutral & Official', desc: 'Based on ECI processes, zero politics', gradient: 'from-amber-500 to-orange-500' },
   ];
 

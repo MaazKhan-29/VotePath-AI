@@ -1,11 +1,9 @@
-const ollamaService = require('./ollamaService');
 const geminiService = require('./geminiService');
 const cacheService = require('./cacheService');
 
 class AIService {
   constructor() {
     this.currentProvider = null;
-    this.ollamaAvailable = false;
     this.geminiAvailable = false;
     this.lastHealthCheck = 0;
     this.healthCheckInterval = 30000; // 30 seconds
@@ -15,26 +13,21 @@ class AIService {
     const now = Date.now();
     if (now - this.lastHealthCheck < this.healthCheckInterval) {
       return {
-        ollama: this.ollamaAvailable,
         gemini: this.geminiAvailable,
         activeProvider: this.currentProvider,
       };
     }
 
-    this.ollamaAvailable = await ollamaService.isAvailable();
     this.geminiAvailable = geminiService.isAvailable();
     this.lastHealthCheck = now;
 
-    if (this.ollamaAvailable) {
-      this.currentProvider = 'ollama';
-    } else if (this.geminiAvailable) {
+    if (this.geminiAvailable) {
       this.currentProvider = 'gemini';
     } else {
       this.currentProvider = null;
     }
 
     return {
-      ollama: this.ollamaAvailable,
       gemini: this.geminiAvailable,
       activeProvider: this.currentProvider,
     };
@@ -56,31 +49,12 @@ class AIService {
       }
     }
 
-    // Step 2: Try Ollama first
+    // Step 2: Try Gemini
     try {
       const health = await this.checkHealth();
 
-      if (health.ollama) {
-        console.log('🦙 Using Ollama (Llama 3.1)...');
-        const result = await ollamaService.generate(prompt, systemPrompt);
-
-        // Cache successful response
-        if (useCache) {
-          const hash = cacheService.generateHash(prompt, systemPrompt);
-          await cacheService.set(hash, result.content, 'ollama');
-        }
-
-        return { ...result, cached: false };
-      }
-    } catch (error) {
-      console.warn('⚠️ Ollama failed:', error.message);
-      this.ollamaAvailable = false;
-    }
-
-    // Step 3: Fallback to Gemini
-    try {
-      if (geminiService.isAvailable()) {
-        console.log('☁️ Falling back to Gemini...');
+      if (health.gemini) {
+        console.log('☁️ Using Gemini...');
         const result = await geminiService.generate(prompt, systemPrompt);
 
         // Cache successful response
@@ -92,15 +66,15 @@ class AIService {
         return { ...result, cached: false };
       }
     } catch (error) {
-      console.error('❌ Gemini also failed:', error.message);
+      console.error('❌ Gemini failed:', error.message);
     }
 
-    // Step 4: Both failed — return fallback message
+    // Step 3: Gemini failed — return fallback message
     return {
       content: this._getFallbackResponse(prompt),
       provider: 'fallback',
       cached: false,
-      error: 'Both AI providers are unavailable. Showing pre-built guidance.',
+      error: 'Gemini AI is unavailable. Showing pre-built guidance.',
     };
   }
 

@@ -5,7 +5,7 @@ import { useUser } from '../context/UserContext';
 import { getChecklist, getJourney } from '../services/api';
 import {
   FiMap, FiCheckSquare, FiCalendar, FiMessageCircle,
-  FiMapPin, FiPlay, FiBookOpen, FiArrowRight, FiTrendingUp
+  FiMapPin, FiPlay, FiBookOpen, FiArrowRight, FiTrendingUp, FiGlobe
 } from 'react-icons/fi';
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.07 } } };
@@ -48,6 +48,8 @@ export default function OverviewPage() {
     { to: '/dashboard/timeline', icon: FiCalendar, label: 'Timeline', desc: 'View important election deadlines', color: 'from-amber-600 to-orange-600' },
     { to: '/dashboard/chat', icon: FiMessageCircle, label: 'AI Chat', desc: 'Ask anything about voting', color: 'from-blue-600 to-cyan-600' },
     { to: '/dashboard/booth', icon: FiMapPin, label: 'Booth Guide', desc: 'Find your polling station', color: 'from-rose-600 to-pink-600' },
+    { to: '/dashboard/eci-map', icon: FiGlobe, label: 'ECI Map', desc: 'Explore state-wise election data', color: 'from-orange-600 to-red-600' },
+    { to: '/dashboard/parliament', icon: FiMap, label: 'Parliament', desc: 'Lok Sabha & Rajya Sabha info', color: 'from-indigo-600 to-violet-600', emoji: '🏛️' },
     { to: '/dashboard/scenarios', icon: FiPlay, label: 'Scenarios', desc: 'Simulate voter situations', color: 'from-purple-600 to-fuchsia-600' },
     { to: '/dashboard/quiz', icon: FiBookOpen, label: 'Learn & Quiz', desc: 'Test election knowledge', color: 'from-sky-600 to-blue-600' },
   ];
@@ -123,12 +125,12 @@ export default function OverviewPage() {
       <motion.div variants={item}>
         <h2 className="text-lg font-semibold mb-4 text-text-primary">Quick Access</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          {quickLinks.map(({ to, icon: Icon, label, desc, color }) => (
+          {quickLinks.map(({ to, icon: Icon, label, desc, color, emoji }) => (
             <Link key={to} to={to}>
               <motion.div whileHover={{ y: -3, scale: 1.01 }} whileTap={{ scale: 0.98 }}
                 className="glass-card p-4 group cursor-pointer h-full">
                 <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center mb-3 shadow-lg group-hover:shadow-xl transition-shadow`}>
-                  <Icon size={18} className="text-white" />
+                  {emoji ? <span className="text-lg">{emoji}</span> : <Icon size={18} className="text-white" />}
                 </div>
                 <h3 className="text-sm font-semibold text-text-primary group-hover:text-primary transition-colors">
                   {label}

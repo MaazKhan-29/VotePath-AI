@@ -13,6 +13,8 @@ import ChatPage from './pages/ChatPage';
 import BoothPage from './pages/BoothPage';
 import ScenarioPage from './pages/ScenarioPage';
 import QuizPage from './pages/QuizPage';
+import ECIMapPage from './pages/ECIMapPage';
+import ParliamentPage from './pages/ParliamentPage';
 import './index.css';
 
 // Show loading while verifying auth token
@@ -86,6 +88,8 @@ function AppRoutes() {
         <Route path="timeline" element={<TimelinePage />} />
         <Route path="chat" element={<ChatPage />} />
         <Route path="booth" element={<BoothPage />} />
+        <Route path="eci-map" element={<ECIMapPage />} />
+        <Route path="parliament" element={<ParliamentPage />} />
         <Route path="scenarios" element={<ScenarioPage />} />
         <Route path="quiz" element={<QuizPage />} />
       </Route>

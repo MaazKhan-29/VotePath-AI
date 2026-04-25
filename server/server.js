@@ -8,7 +8,7 @@ const { protect } = require('./middleware/authMiddleware');
 const aiService = require('./services/aiService');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT) || 5000;
 
 // Connect to MongoDB
 connectDB();
@@ -45,17 +45,30 @@ app.get('/api/health', async (req, res) => {
 // Error handler
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`\n🚀 VotePath AI Server running on port ${PORT}`);
-  console.log(`📡 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔐 Auth: JWT + Google OAuth enabled\n`);
+const startServer = (port) => {
+  const server = app.listen(port, () => {
+    console.log(`\n🚀 VotePath AI Server running on port ${port}`);
+    console.log(`📡 Health check: http://localhost:${port}/api/health`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔐 Auth: JWT + Google OAuth enabled\n`);
 
-  // Check AI availability on startup
-  aiService.getStatus().then(status => {
-    console.log('🤖 AI Status:');
-    console.log(`   Ollama (Local): ${status.ollama ? '🟢 Available' : '🔴 Unavailable'}`);
-    console.log(`   Gemini (Cloud): ${status.gemini ? '🟢 Available' : '🔴 Unavailable'}`);
-    console.log(`   Active Provider: ${status.activeProvider || 'None (using fallback)'}\n`);
+    // Check AI availability on startup
+    aiService.getStatus().then(status => {
+      console.log('🤖 AI Status:');
+      console.log(`   Gemini: ${status.gemini ? '🟢 Available' : '🔴 Unavailable'}`);
+      console.log(`   Active Provider: ${status.activeProvider || 'None (using fallback)'}\n`);
+    });
   });
-});
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.warn(`⚠️  Port ${port} is busy, trying ${port + 1}...`);
+      startServer(port + 1);
+    } else {
+      console.error('❌ Server error:', err);
+      process.exit(1);
+    }
+  });
+};
+
+startServer(PORT);
