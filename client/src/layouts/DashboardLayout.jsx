@@ -26,8 +26,18 @@ export default function DashboardLayout() {
 
   const handleLogout = () => {
     logoutUser();
-    navigate('/');
+    navigate('/auth');
   };
+
+  const UserAvatar = ({ size = 'w-8 h-8', textSize = 'text-xs' }) => (
+    user?.avatar ? (
+      <img src={user.avatar} alt="" className={`${size} rounded-full object-cover`} referrerPolicy="no-referrer" />
+    ) : (
+      <div className={`${size} rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center ${textSize} font-bold text-white`}>
+        {user?.name?.charAt(0)?.toUpperCase()}
+      </div>
+    )
+  );
 
   const getAIBadge = () => {
     if (aiStatus.activeProvider === 'ollama') {
@@ -108,12 +118,10 @@ export default function DashboardLayout() {
         <div className="p-4 border-t border-border space-y-3">
           {getAIBadge()}
           <div className="flex items-center gap-3 p-2 rounded-xl bg-bg-elevated">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-xs font-bold text-white">
-              {user?.name?.charAt(0)?.toUpperCase()}
-            </div>
+            <UserAvatar />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-text-primary truncate">{user?.name}</p>
-              <p className="text-[10px] text-text-muted">{user?.state}</p>
+              <p className="text-[10px] text-text-muted truncate">{user?.email || user?.state}</p>
             </div>
             <button onClick={handleLogout}
               className="p-1.5 rounded-lg text-text-muted hover:text-accent hover:bg-accent/10 transition-colors"
@@ -148,9 +156,7 @@ export default function DashboardLayout() {
             <div className="flex items-center gap-3">
               <div className="hidden sm:block">{getAIBadge()}</div>
               <div className="hidden lg:flex items-center gap-2 pl-3 border-l border-border">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-xs font-bold text-white">
-                  {user?.name?.charAt(0)?.toUpperCase()}
-                </div>
+                <UserAvatar size="w-7 h-7" textSize="text-[10px]" />
                 <span className="text-sm text-text-secondary">
                   {user?.name}
                 </span>
@@ -223,9 +229,7 @@ export default function DashboardLayout() {
               <div className="p-4 border-t border-border space-y-3">
                 {getAIBadge()}
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-xs font-bold text-white">
-                    {user?.name?.charAt(0)?.toUpperCase()}
-                  </div>
+                  <UserAvatar />
                   <div className="flex-1">
                     <p className="text-sm font-medium">{user?.name}</p>
                     <p className="text-[10px] text-text-muted">{user?.state} • Age {user?.age}</p>

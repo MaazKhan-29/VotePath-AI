@@ -6,7 +6,40 @@ const API = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// User APIs
+// ── JWT Token Interceptor ─────────────────────────────────
+// Automatically attach token to every request
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem('votepath_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Handle 401 responses (expired token)
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('votepath_token');
+      localStorage.removeItem('votepath_user');
+      // Only redirect if not already on auth page
+      if (!window.location.pathname.startsWith('/auth')) {
+        window.location.href = '/auth';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+// ── Auth APIs ─────────────────────────────────────────────
+export const authRegister = (data) => API.post('/auth/register', data);
+export const authLogin = (data) => API.post('/auth/login', data);
+export const authGoogle = (idToken) => API.post('/auth/google', { idToken });
+export const authCompleteProfile = (data) => API.put('/auth/complete-profile', data);
+export const authGetMe = () => API.get('/auth/me');
+
+// ── User APIs ─────────────────────────────────────────────
 export const initUser = (data) => API.post('/user/init', data);
 export const getUser = (userId) => API.get(`/user/${userId}`);
 

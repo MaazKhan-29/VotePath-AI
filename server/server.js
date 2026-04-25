@@ -4,6 +4,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
 const { errorHandler } = require('./middleware/errorHandler');
+const { protect } = require('./middleware/authMiddleware');
 const aiService = require('./services/aiService');
 
 const app = express();
@@ -17,17 +18,20 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Routes
-app.use('/api/user', require('./routes/userRoutes'));
-app.use('/api/journey', require('./routes/journeyRoutes'));
-app.use('/api/chat', require('./routes/chatRoutes'));
-app.use('/api/checklist', require('./routes/checklistRoutes'));
-app.use('/api/timeline', require('./routes/timelineRoutes'));
-app.use('/api/scenario', require('./routes/scenarioRoutes'));
-app.use('/api/quiz', require('./routes/quizRoutes'));
-app.use('/api/booth', require('./routes/boothRoutes'));
+// Public routes
+app.use('/api/auth', require('./routes/authRoutes'));
 
-// Health check endpoint
+// Protected routes (require JWT)
+app.use('/api/user', protect, require('./routes/userRoutes'));
+app.use('/api/journey', protect, require('./routes/journeyRoutes'));
+app.use('/api/chat', protect, require('./routes/chatRoutes'));
+app.use('/api/checklist', protect, require('./routes/checklistRoutes'));
+app.use('/api/timeline', protect, require('./routes/timelineRoutes'));
+app.use('/api/scenario', protect, require('./routes/scenarioRoutes'));
+app.use('/api/quiz', protect, require('./routes/quizRoutes'));
+app.use('/api/booth', protect, require('./routes/boothRoutes'));
+
+// Health check endpoint (public)
 app.get('/api/health', async (req, res) => {
   const aiStatus = await aiService.getStatus();
   res.json({
@@ -44,8 +48,9 @@ app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`\n🚀 VotePath AI Server running on port ${PORT}`);
   console.log(`📡 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}\n`);
-  
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔐 Auth: JWT + Google OAuth enabled\n`);
+
   // Check AI availability on startup
   aiService.getStatus().then(status => {
     console.log('🤖 AI Status:');

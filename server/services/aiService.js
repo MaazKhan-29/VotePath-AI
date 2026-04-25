@@ -59,17 +59,17 @@ class AIService {
     // Step 2: Try Ollama first
     try {
       const health = await this.checkHealth();
-      
+
       if (health.ollama) {
         console.log('🦙 Using Ollama (Llama 3.1)...');
         const result = await ollamaService.generate(prompt, systemPrompt);
-        
+
         // Cache successful response
         if (useCache) {
           const hash = cacheService.generateHash(prompt, systemPrompt);
           await cacheService.set(hash, result.content, 'ollama');
         }
-        
+
         return { ...result, cached: false };
       }
     } catch (error) {
@@ -82,13 +82,13 @@ class AIService {
       if (geminiService.isAvailable()) {
         console.log('☁️ Falling back to Gemini...');
         const result = await geminiService.generate(prompt, systemPrompt);
-        
+
         // Cache successful response
         if (useCache) {
           const hash = cacheService.generateHash(prompt, systemPrompt);
           await cacheService.set(hash, result.content, 'gemini');
         }
-        
+
         return { ...result, cached: false };
       }
     } catch (error) {
@@ -106,7 +106,7 @@ class AIService {
 
   _getFallbackResponse(prompt) {
     const lowerPrompt = prompt.toLowerCase();
-    
+
     if (lowerPrompt.includes('register') || lowerPrompt.includes('voter id')) {
       return `## How to Register as a Voter in India
 

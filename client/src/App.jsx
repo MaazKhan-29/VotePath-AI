@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 import { UserProvider, useUser } from './context/UserContext';
 import LandingPage from './pages/LandingPage';
+import AuthPage from './pages/AuthPage';
+import SetupPage from './pages/SetupPage';
 import DashboardLayout from './layouts/DashboardLayout';
 import OverviewPage from './pages/OverviewPage';
 import JourneyPage from './pages/JourneyPage';
@@ -13,18 +15,68 @@ import ScenarioPage from './pages/ScenarioPage';
 import QuizPage from './pages/QuizPage';
 import './index.css';
 
+// Show loading while verifying auth token
+function AuthLoading() {
+  return (
+    <div className="min-h-screen bg-bg-dark flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center mx-auto mb-4 text-xl shadow-xl shadow-primary/20 animate-pulse">
+          🗳️
+        </div>
+        <p className="text-text-muted text-sm animate-pulse">Loading VotePath AI...</p>
+      </div>
+    </div>
+  );
+}
+
+// Requires auth + completed profile
 function ProtectedRoute({ children }) {
-  const { user } = useUser();
-  return user ? children : <Navigate to="/" replace />;
+  const { user, loading } = useUser();
+  if (loading) return <AuthLoading />;
+  if (!user) return <Navigate to="/auth" replace />;
+  if (!user.profileCompleted) return <Navigate to="/setup" replace />;
+  return children;
+}
+
+// Requires auth only (for setup page)
+function AuthRequired({ children }) {
+  const { user, loading } = useUser();
+  if (loading) return <AuthLoading />;
+  if (!user) return <Navigate to="/auth" replace />;
+  return children;
 }
 
 function AppRoutes() {
-  const { user } = useUser();
+  const { user, loading } = useUser();
+
+  if (loading) return <AuthLoading />;
 
   return (
     <Routes>
-      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
-      
+      {/* Public routes */}
+      <Route path="/" element={
+        user ? (
+          user.profileCompleted ? <Navigate to="/dashboard" replace /> : <Navigate to="/setup" replace />
+        ) : (
+          <LandingPage />
+        )
+      } />
+      <Route path="/auth" element={
+        user ? (
+          user.profileCompleted ? <Navigate to="/dashboard" replace /> : <Navigate to="/setup" replace />
+        ) : (
+          <AuthPage />
+        )
+      } />
+
+      {/* Requires auth but profile may be incomplete */}
+      <Route path="/setup" element={
+        <AuthRequired>
+          {user?.profileCompleted ? <Navigate to="/dashboard" replace /> : <SetupPage />}
+        </AuthRequired>
+      } />
+
+      {/* Protected dashboard routes */}
       <Route path="/dashboard" element={
         <ProtectedRoute><DashboardLayout /></ProtectedRoute>
       }>
@@ -37,11 +89,13 @@ function AppRoutes() {
         <Route path="scenarios" element={<ScenarioPage />} />
         <Route path="quiz" element={<QuizPage />} />
       </Route>
-      
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
+
+// Use environment variable for Google Client ID, fallback for development
 
 function App() {
   return (

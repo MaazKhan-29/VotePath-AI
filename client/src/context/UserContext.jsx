@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { getHealth } from '../services/api';
+import { getHealth, authGetMe } from '../services/api';
 
 const UserContext = createContext(null);
 
@@ -12,10 +12,39 @@ export const useUser = () => {
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [checklist, setChecklist] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('votepath_token'));
   const [aiStatus, setAiStatus] = useState({ ollama: false, gemini: false, activeProvider: null });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // true until we've checked auth
 
-  // Check AI health on mount
+  // On mount: verify stored token by calling /auth/me
+  useEffect(() => {
+    const verifyAuth = async () => {
+      const storedToken = localStorage.getItem('votepath_token');
+      if (!storedToken) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data } = await authGetMe();
+        if (data.success) {
+          setUser(data.data.user);
+          setChecklist(data.data.checklist);
+          setToken(storedToken);
+        } else {
+          clearAuth();
+        }
+      } catch (e) {
+        // Token expired or invalid
+        clearAuth();
+      }
+      setLoading(false);
+    };
+
+    verifyAuth();
+  }, []);
+
+  // Poll AI health
   useEffect(() => {
     const checkAI = async () => {
       try {
@@ -30,15 +59,28 @@ export const UserProvider = ({ children }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const loginUser = (userData, checklistData) => {
+  const loginUser = (userData, authToken, checklistData = null) => {
     setUser(userData);
+    setToken(authToken);
     setChecklist(checklistData);
+    localStorage.setItem('votepath_token', authToken);
+    localStorage.setItem('votepath_user', JSON.stringify(userData));
+  };
+
+  const updateUser = (userData) => {
+    setUser(userData);
     localStorage.setItem('votepath_user', JSON.stringify(userData));
   };
 
   const logoutUser = () => {
+    clearAuth();
+  };
+
+  const clearAuth = () => {
     setUser(null);
+    setToken(null);
     setChecklist(null);
+    localStorage.removeItem('votepath_token');
     localStorage.removeItem('votepath_user');
   };
 
@@ -48,9 +90,9 @@ export const UserProvider = ({ children }) => {
 
   return (
     <UserContext.Provider value={{
-      user, setUser, checklist, setChecklist,
+      user, setUser, checklist, setChecklist, token,
       aiStatus, setAiStatus, loading, setLoading,
-      loginUser, logoutUser, updateReadinessScore,
+      loginUser, logoutUser, updateUser, updateReadinessScore,
     }}>
       {children}
     </UserContext.Provider>
