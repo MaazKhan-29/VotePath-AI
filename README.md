@@ -71,52 +71,7 @@ VotePath AI isn't just an FAQ wrapper; it's a dynamic, context-aware engine.
 
 The platform follows a robust, decoupled MERN stack architecture designed for scale and fast AI inference.
 
-```mermaid
-flowchart TB
-    %% Styling Definitions
-    classDef client fill:#e0f7fa,stroke:#006064,stroke-width:2px,color:#004d40
-    classDef server fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#e65100
-    classDef ai fill:#e8eaf6,stroke:#3f51b5,stroke-width:2px,color:#1a237e
-    classDef db fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px,color:#1b5e20
-    classDef auth fill:#ffebee,stroke:#b71c1c,stroke-width:2px,color:#b71c1c
-
-    %% Layout Architecture
-    subgraph Frontend ["🖥️ Client (React 19 & TailwindCSS)"]
-        direction TB
-        UI("Interactive Dashboard UI"):::client
-        State("Global State & Context"):::client
-        FirebaseClient("Firebase Auth Client SDK"):::auth
-    end
-
-    subgraph Backend ["⚙️ Server (Node.js & Express)"]
-        direction TB
-        Router("API Gateway & Routes"):::server
-        AuthMid("JWT & Security Middleware"):::server
-        Cache("Response Caching Engine"):::server
-    end
-
-    subgraph External ["☁️ Cloud & AI Services"]
-        direction TB
-        Gemini("Google Gemini 2.0 AI"):::ai
-        Mongo[("MongoDB Atlas Database")]:::db
-        FirebaseAuth("Firebase Admin SDK"):::auth
-    end
-
-    %% Connections & Flow
-    UI -- "REST API Calls (Axios)" --> Router
-    FirebaseClient -- "Fetches Auth Token" --> FirebaseAuth
-    UI -. "Reads User Status" .-> FirebaseClient
-
-    Router --> AuthMid
-    AuthMid -- "Validates Token" --> FirebaseAuth
-    
-    AuthMid --> Cache
-    Cache -- "Cache Miss" --> Gemini
-    Cache -- "Cache Hit / Store" --> Mongo
-    
-    %% AI Flow specifics
-    Gemini -- "Generates Personalized Prompts" --> Router
-```
+![VotePath AI Architecture Diagram](Architecture.png)
 
 ### ⚡ Technical Highlights
 - **AI Response Caching:** To minimize latency and API costs, frequent Gemini queries are cached in MongoDB.
