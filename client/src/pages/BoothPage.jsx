@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import BoothAssistant from '../components/BoothAssistant';
+import EVMDemo from '../components/EVMDemo';
 import { FiMapPin, FiExternalLink, FiPhone } from 'react-icons/fi';
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } };
@@ -61,6 +62,11 @@ export default function BoothPage() {
       {/* Booth Assistant — Main */}
       <motion.div variants={item}>
         <BoothAssistant />
+      </motion.div>
+
+      {/* Interactive EVM Demo */}
+      <motion.div variants={item}>
+        <EVMDemo />
       </motion.div>
 
       {/* Booth Etiquette Grid */}

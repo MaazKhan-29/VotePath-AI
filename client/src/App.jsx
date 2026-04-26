@@ -20,6 +20,7 @@ const ParliamentPage = lazy(() => import('./pages/ParliamentPage'));
 const ScenarioPage = lazy(() => import('./pages/ScenarioPage'));
 const QuizPage = lazy(() => import('./pages/QuizPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const TranslatorPage = lazy(() => import('./pages/TranslatorPage'));
 
 // ── Premium Loading Spinner ──
 function LoadingScreen({ text = 'Loading' }) {
@@ -118,6 +119,7 @@ function AppRoutes() {
         <Route path="parliament" element={<Suspense fallback={<PageLoader />}><ParliamentPage /></Suspense>} />
         <Route path="scenarios" element={<Suspense fallback={<PageLoader />}><ScenarioPage /></Suspense>} />
         <Route path="quiz" element={<Suspense fallback={<PageLoader />}><QuizPage /></Suspense>} />
+        <Route path="translator" element={<Suspense fallback={<PageLoader />}><TranslatorPage /></Suspense>} />
         <Route path="profile" element={<Suspense fallback={<PageLoader />}><ProfilePage /></Suspense>} />
       </Route>
 

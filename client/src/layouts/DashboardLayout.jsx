@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { path: '/dashboard/parliament', iconEmoji: '🏛️', label: 'Parliament' },
   { path: '/dashboard/scenarios', iconEmoji: '🎭', label: 'Scenarios' },
   { path: '/dashboard/quiz', iconEmoji: '🧠', label: 'Quiz' },
+  { path: '/dashboard/translator', iconEmoji: '🌐', label: 'Translate' },
 ];
 
 /* ── Staggered children animation ── */

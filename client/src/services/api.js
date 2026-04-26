@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+// In production: VITE_API_URL = Render backend URL
+// In development: Vite proxy handles /api → localhost:5002
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
 const API = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE,
   timeout: 60000,
   headers: { 'Content-Type': 'application/json' },
 });
@@ -72,5 +76,9 @@ export const submitQuiz = (userId, answers) => API.post('/quiz/submit', { userId
 
 // Health check
 export const getHealth = () => API.get('/health');
+
+// Translate API
+export const translateText = (text, targetLanguage, targetLanguageCode) =>
+  API.post('/translate', { text, targetLanguage, targetLanguageCode });
 
 export default API;
