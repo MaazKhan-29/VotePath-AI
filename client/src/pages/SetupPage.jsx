@@ -7,11 +7,11 @@ import toast from 'react-hot-toast';
 import { FiArrowRight, FiMapPin, FiUser } from 'react-icons/fi';
 
 const INDIAN_STATES = [
-  'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana',
-  'Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur',
-  'Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana',
-  'Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Delhi','Jammu & Kashmir','Ladakh',
-  'Chandigarh','Puducherry','Andaman & Nicobar','Dadra & Nagar Haveli','Lakshadweep',
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana',
+  'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana',
+  'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi', 'Jammu & Kashmir', 'Ladakh',
+  'Chandigarh', 'Puducherry', 'Andaman & Nicobar', 'Dadra & Nagar Haveli', 'Lakshadweep',
 ];
 
 export default function SetupPage() {
@@ -107,14 +107,14 @@ export default function SetupPage() {
                     Age <span className="text-accent">*</span>
                   </label>
                   <input type="number" className="input-field" placeholder="e.g. 19" min="17" max="120"
-                    value={formData.age} onChange={e => setFormData({...formData, age: e.target.value})} />
+                    value={formData.age} onChange={e => setFormData({ ...formData, age: e.target.value })} />
                 </div>
                 <div>
                   <label className="block text-xs text-text-secondary mb-1.5 font-medium">
                     <FiMapPin className="inline mr-1" size={12} /> Pincode
                   </label>
                   <input type="text" className="input-field" placeholder="e.g. 400001"
-                    value={formData.pincode} onChange={e => setFormData({...formData, pincode: e.target.value})} />
+                    value={formData.pincode} onChange={e => setFormData({ ...formData, pincode: e.target.value })} />
                 </div>
               </div>
 
@@ -123,7 +123,7 @@ export default function SetupPage() {
                   State / UT <span className="text-accent">*</span>
                 </label>
                 <select className="input-field"
-                  value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})}>
+                  value={formData.state} onChange={e => setFormData({ ...formData, state: e.target.value })}>
                   <option value="">Select your state</option>
                   {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
@@ -134,7 +134,7 @@ export default function SetupPage() {
                   Voter Registration Status
                 </label>
                 <select className="input-field"
-                  value={formData.voterStatus} onChange={e => setFormData({...formData, voterStatus: e.target.value})}>
+                  value={formData.voterStatus} onChange={e => setFormData({ ...formData, voterStatus: e.target.value })}>
                   <option value="unknown">I don't know</option>
                   <option value="not_registered">Not registered</option>
                   <option value="applied">Applied, waiting for approval</option>
@@ -146,7 +146,7 @@ export default function SetupPage() {
                 <label className="flex items-center gap-2.5 cursor-pointer group">
                   <input type="checkbox" className="w-4 h-4 accent-primary rounded"
                     checked={formData.hasVoterId}
-                    onChange={e => setFormData({...formData, hasVoterId: e.target.checked})} />
+                    onChange={e => setFormData({ ...formData, hasVoterId: e.target.checked })} />
                   <span className="text-text-secondary text-xs group-hover:text-text-primary transition-colors">
                     I have a Voter ID (EPIC) card
                   </span>
@@ -154,7 +154,7 @@ export default function SetupPage() {
                 <label className="flex items-center gap-2.5 cursor-pointer group">
                   <input type="checkbox" className="w-4 h-4 accent-primary rounded"
                     checked={formData.isFirstTimeVoter}
-                    onChange={e => setFormData({...formData, isFirstTimeVoter: e.target.checked})} />
+                    onChange={e => setFormData({ ...formData, isFirstTimeVoter: e.target.checked })} />
                   <span className="text-text-secondary text-xs group-hover:text-text-primary transition-colors">
                     This will be my first time voting
                   </span>

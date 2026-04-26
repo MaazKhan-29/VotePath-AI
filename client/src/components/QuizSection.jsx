@@ -106,7 +106,7 @@ export default function QuizSection() {
             {quiz.questions.map((q, i) => {
               const r = results.results.find(r => r.questionId === q.id);
               return (
-                <div key={q.id} className={`p-3 rounded-xl text-xs ${r?.correct ? 'bg-secondary/5 border border-secondary/20' : 'bg-accent/5 border border-accent/20'}`}>
+                <div key={q.id} className={`p-3 rounded-xl text-xs ${r?.correct ? 'bg-secondary/5 border border-secondary/20' : 'bg-red-500/5 border border-red-500/20'}`}>
                   <p className="font-medium text-text-primary mb-1">
                     {r?.correct ? '✅' : '❌'} {q.question}
                   </p>

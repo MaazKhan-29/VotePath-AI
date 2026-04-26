@@ -5,7 +5,7 @@ import { getChecklist, updateChecklistItem } from '../services/api';
 import toast from 'react-hot-toast';
 import { FiCheckSquare, FiSquare, FiCheck } from 'react-icons/fi';
 
-export default function SmartChecklist() {
+export default function SmartChecklist({ onProgressChange }) {
   const { user } = useUser();
   const [items, setItems] = useState([]);
   const [progress, setProgress] = useState({ completed: 0, total: 0, percentage: 0 });
@@ -34,6 +34,7 @@ export default function SmartChecklist() {
       if (data.success) {
         setItems(data.data.items);
         setProgress(data.data.progress);
+        onProgressChange?.(data.data.progress);
         toast.success(item.completed ? 'Unchecked!' : 'Step completed! ✨');
       }
     } catch (e) {
@@ -55,7 +56,7 @@ export default function SmartChecklist() {
       {/* Progress bar */}
       <div className="w-full h-2 rounded-full bg-border mb-4 overflow-hidden">
         <motion.div className="h-full rounded-full"
-          style={{ background: 'linear-gradient(90deg, #6C63FF, #00D9A6)' }}
+          style={{ background: 'linear-gradient(90deg, var(--color-primary), var(--color-secondary))' }}
           initial={{ width: 0 }}
           animate={{ width: `${progress.percentage}%` }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -67,7 +68,7 @@ export default function SmartChecklist() {
           {[1,2,3,4].map(i => <div key={i} className="loading-shimmer h-14 w-full" />)}
         </div>
       ) : (
-        <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+        <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
           {items.map((item, i) => (
             <motion.div key={item.key}
               initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}

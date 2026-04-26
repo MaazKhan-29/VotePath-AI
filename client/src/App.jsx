@@ -1,31 +1,59 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { UserProvider, useUser } from './context/UserContext';
-import LandingPage from './pages/LandingPage';
-import AuthPage from './pages/AuthPage';
-import SetupPage from './pages/SetupPage';
-import DashboardLayout from './layouts/DashboardLayout';
-import OverviewPage from './pages/OverviewPage';
-import JourneyPage from './pages/JourneyPage';
-import ChecklistPage from './pages/ChecklistPage';
-import TimelinePage from './pages/TimelinePage';
-import ChatPage from './pages/ChatPage';
-import BoothPage from './pages/BoothPage';
-import ScenarioPage from './pages/ScenarioPage';
-import QuizPage from './pages/QuizPage';
-import ECIMapPage from './pages/ECIMapPage';
-import ParliamentPage from './pages/ParliamentPage';
 import './index.css';
 
-// Show loading while verifying auth token
-function AuthLoading() {
+// ── Eager loads (critical path) ──
+import LandingPage from './pages/LandingPage';
+import AuthPage from './pages/AuthPage';
+
+// ── Lazy loads (code-split per route) ──
+const SetupPage = lazy(() => import('./pages/SetupPage'));
+const DashboardLayout = lazy(() => import('./layouts/DashboardLayout'));
+const OverviewPage = lazy(() => import('./pages/OverviewPage'));
+const TimelinePage = lazy(() => import('./pages/TimelinePage'));
+const ChatPage = lazy(() => import('./pages/ChatPage'));
+const BoothPage = lazy(() => import('./pages/BoothPage'));
+const ECIMapPage = lazy(() => import('./pages/ECIMapPage'));
+const ParliamentPage = lazy(() => import('./pages/ParliamentPage'));
+const ScenarioPage = lazy(() => import('./pages/ScenarioPage'));
+const QuizPage = lazy(() => import('./pages/QuizPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+
+// ── Premium Loading Spinner ──
+function LoadingScreen({ text = 'Loading' }) {
   return (
     <div className="min-h-screen bg-bg-dark flex items-center justify-center">
       <div className="text-center">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center mx-auto mb-4 text-xl shadow-xl shadow-primary/20 animate-pulse">
-          🗳️
+        <div className="relative w-14 h-14 mx-auto mb-5">
+          {/* Outer ring */}
+          <div className="absolute inset-0 rounded-2xl border-2 border-primary/20 animate-pulse" />
+          {/* Spinning ring */}
+          <div className="absolute inset-0 rounded-2xl border-2 border-transparent border-t-primary animate-spin" style={{ animationDuration: '0.8s' }} />
+          {/* Icon */}
+          <div className="absolute inset-0 flex items-center justify-center text-xl">
+            🗳️
+          </div>
         </div>
-        <p className="text-text-muted text-sm animate-pulse">Loading VotePath AI...</p>
+        <p className="text-text-muted text-sm font-medium">{text}</p>
+        <div className="flex items-center justify-center gap-1 mt-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Route-level fallback (lighter) ──
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center h-full min-h-[50vh]">
+      <div className="text-center">
+        <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-text-muted text-xs">Loading page</p>
       </div>
     </div>
   );
@@ -34,28 +62,28 @@ function AuthLoading() {
 // Requires auth + completed profile
 function ProtectedRoute({ children }) {
   const { user, loading } = useUser();
-  if (loading) return <AuthLoading />;
+  if (loading) return <LoadingScreen text="Verifying Session" />;
   if (!user) return <Navigate to="/auth" replace />;
   if (!user.profileCompleted) return <Navigate to="/setup" replace />;
-  return children;
+  return <Suspense fallback={<PageLoader />}>{children}</Suspense>;
 }
 
 // Requires auth only (for setup page)
 function AuthRequired({ children }) {
   const { user, loading } = useUser();
-  if (loading) return <AuthLoading />;
+  if (loading) return <LoadingScreen text="Verifying Session" />;
   if (!user) return <Navigate to="/auth" replace />;
-  return children;
+  return <Suspense fallback={<PageLoader />}>{children}</Suspense>;
 }
 
 function AppRoutes() {
   const { user, loading } = useUser();
 
-  if (loading) return <AuthLoading />;
+  if (loading) return <LoadingScreen text="Starting VotePath AI" />;
 
   return (
     <Routes>
-      {/* Public routes */}
+      {/* Public routes (eagerly loaded) */}
       <Route path="/" element={
         user ? (
           user.profileCompleted ? <Navigate to="/dashboard" replace /> : <Navigate to="/setup" replace />
@@ -78,28 +106,25 @@ function AppRoutes() {
         </AuthRequired>
       } />
 
-      {/* Protected dashboard routes */}
+      {/* Protected dashboard routes (lazy loaded) */}
       <Route path="/dashboard" element={
         <ProtectedRoute><DashboardLayout /></ProtectedRoute>
       }>
-        <Route index element={<OverviewPage />} />
-        <Route path="journey" element={<JourneyPage />} />
-        <Route path="checklist" element={<ChecklistPage />} />
-        <Route path="timeline" element={<TimelinePage />} />
-        <Route path="chat" element={<ChatPage />} />
-        <Route path="booth" element={<BoothPage />} />
-        <Route path="eci-map" element={<ECIMapPage />} />
-        <Route path="parliament" element={<ParliamentPage />} />
-        <Route path="scenarios" element={<ScenarioPage />} />
-        <Route path="quiz" element={<QuizPage />} />
+        <Route index element={<Suspense fallback={<PageLoader />}><OverviewPage /></Suspense>} />
+        <Route path="timeline" element={<Suspense fallback={<PageLoader />}><TimelinePage /></Suspense>} />
+        <Route path="chat" element={<Suspense fallback={<PageLoader />}><ChatPage /></Suspense>} />
+        <Route path="booth" element={<Suspense fallback={<PageLoader />}><BoothPage /></Suspense>} />
+        <Route path="eci-map" element={<Suspense fallback={<PageLoader />}><ECIMapPage /></Suspense>} />
+        <Route path="parliament" element={<Suspense fallback={<PageLoader />}><ParliamentPage /></Suspense>} />
+        <Route path="scenarios" element={<Suspense fallback={<PageLoader />}><ScenarioPage /></Suspense>} />
+        <Route path="quiz" element={<Suspense fallback={<PageLoader />}><QuizPage /></Suspense>} />
+        <Route path="profile" element={<Suspense fallback={<PageLoader />}><ProfilePage /></Suspense>} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
-
-// Use environment variable for Google Client ID, fallback for development
 
 function App() {
   return (
@@ -110,9 +135,9 @@ function App() {
           position="top-right"
           toastOptions={{
             style: {
-              background: '#1A1A2E',
-              color: '#FFFFFF',
-              border: '1px solid #252545',
+              background: 'var(--color-bg-card)',
+              color: 'var(--color-text-primary)',
+              border: '1px solid var(--color-border)',
               borderRadius: '12px',
               fontSize: '14px',
             },

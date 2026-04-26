@@ -223,5 +223,28 @@ const getMe = asyncHandler(async (req, res) => {
     data: { user: req.user, checklist },
   });
 });
+// ─────────────────────────────────────────────────────────
+// PUT /api/auth/update-profile — Update profile fields
+// ─────────────────────────────────────────────────────────
+const updateProfile = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const { name, age, state, pincode, voterStatus, hasVoterId, isFirstTimeVoter } = req.body;
 
-module.exports = { register, login, googleAuth, completeProfile, getMe };
+  if (name !== undefined) user.name = name;
+  if (age !== undefined) user.age = parseInt(age);
+  if (state !== undefined) user.state = state;
+  if (pincode !== undefined) user.pincode = pincode;
+  if (voterStatus !== undefined) user.voterStatus = voterStatus;
+  if (hasVoterId !== undefined) user.hasVoterId = hasVoterId;
+  if (isFirstTimeVoter !== undefined) user.isFirstTimeVoter = isFirstTimeVoter;
+
+  user.readinessScore = calcReadinessScore(user);
+  await user.save();
+
+  const userObj = user.toObject();
+  delete userObj.password;
+
+  res.json({ success: true, data: { user: userObj } });
+});
+
+module.exports = { register, login, googleAuth, completeProfile, getMe, updateProfile };

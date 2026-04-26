@@ -44,13 +44,13 @@ export default function ChatPage() {
         } else {
           setMessages([{
             role: 'assistant',
-            content: `🙏 Namaste! I'm **VotePath AI**, your Indian elections guide.\n\nI can help you with:\n• How to register to vote\n• Understanding EVMs and VVPAT\n• Types of elections in India\n• Voter rights and the Model Code of Conduct\n• Answering in **Hindi or English**\n\nWhat would you like to know? / आप क्या जानना चाहते हैं?`,
+            content: `🙏 **Namaste ${user?.name}!** Welcome to **VotePath AI** — your personal Indian election assistant.\n\n## 🤖 Who Am I?\nI am an AI-powered guide built on official **Election Commission of India (ECI)** data to help you navigate the entire voting process.\n\n## 🛠️ How Can I Help You?\n• **Voter Registration** — How to register, Form 6, eligibility\n• **Voter ID Issues** — Lost ID, name mismatch, corrections\n• **Polling Booth** — Find your booth, what to carry\n• **EVM & VVPAT** — How electronic voting machines work\n• **Election Rules** — Model Code of Conduct, voter rights\n• **Special Voting** — NRI, senior citizens, PwD, postal ballot\n• **Complaints** — Report violations via cVIGIL app\n• **Hindi / English** — I can answer in both! 🇮🇳\n\n## 📞 Quick Info\n• **ECI Helpline:** 1950\n• **Voter Portal:** https://voters.eci.gov.in/\n\n👉 **Next Step:** Ask me anything about voting, or type your question in Hindi!`,
           }]);
         }
       } catch {
         setMessages([{
           role: 'assistant',
-          content: `🙏 Namaste ${user?.name}! I'm your VotePath AI assistant. Ask me anything about the Indian voting process!`,
+          content: `🙏 **Namaste ${user?.name}!** Welcome to **VotePath AI**.\n\n## 🤖 Who Am I?\nI am your AI election assistant powered by **ECI** data.\n\n## 🛠️ I Can Help With:\n• Voter Registration & ID issues\n• Polling booth search\n• EVM & VVPAT explained\n• Election rules & voter rights\n• Hindi & English support 🇮🇳\n\n👉 **Next Step:** Ask me anything about voting!`,
         }]);
       }
     };
@@ -136,8 +136,8 @@ export default function ChatPage() {
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
-            <FiMessageCircle size={18} className="text-white" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg shadow-primary/20">
+            <span className="text-lg">🤖</span>
           </div>
           <div>
             <h1 className="text-xl font-bold text-text-primary">AI Assistant</h1>
@@ -145,11 +145,10 @@ export default function ChatPage() {
           </div>
         </div>
         <button onClick={() => { setVoiceOn(!voiceOn); if (voiceOn) window.speechSynthesis?.cancel(); }}
-          className={`p-2.5 rounded-xl transition-all border ${
-            voiceOn
+          className={`p-2.5 rounded-xl transition-all border ${voiceOn
               ? 'bg-primary/15 border-primary/30 text-primary'
               : 'bg-bg-elevated border-border text-text-muted hover:text-text-primary'
-          }`}
+            }`}
           title={voiceOn ? 'Disable Voice' : 'Enable Voice'}>
           {voiceOn ? <FiVolume2 size={16} /> : <FiVolumeX size={16} />}
         </button>
@@ -160,17 +159,17 @@ export default function ChatPage() {
 
         {/* ===== MAIN CHAT AREA ===== */}
         <div className="flex flex-col glass-card overflow-hidden">
-          <div className="h-0.5 bg-gradient-to-r from-orange-500 via-primary to-secondary" />
+          <div className="h-0.5 bg-gradient-to-r from-primary via-secondary to-primary-glow" />
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-4">
+          <div className="flex-1 overflow-y-auto p-5 space-y-4 chat-scroll-hide">
             <AnimatePresence>
               {messages.map((msg, i) => (
                 <motion.div key={i}
                   initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                   className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   {msg.role === 'assistant' && (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center flex-shrink-0 text-sm shadow-md">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0 text-sm shadow-md">
                       🤖
                     </div>
                   )}
@@ -185,7 +184,7 @@ export default function ChatPage() {
 
             {sending && (
               <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center flex-shrink-0 text-sm">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0 text-sm">
                   🤖
                 </div>
                 <div className="chat-bubble-assistant">
@@ -208,10 +207,10 @@ export default function ChatPage() {
                 onKeyDown={e => e.key === 'Enter' && handleSend()}
                 disabled={sending}
                 className="input-field flex-1 text-sm"
-                placeholder="Ask about elections... / चुनाव के बारे में पूछें..." />
+                placeholder="Ask about elections | चुनाव के बारे में पूछें" />
               <motion.button onClick={() => handleSend()} disabled={sending || !input.trim()}
                 whileTap={{ scale: 0.9 }}
-                className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-orange-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity hover:shadow-xl">
+                className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white shadow-lg shadow-primary/20 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity hover:shadow-xl">
                 <FiSend size={16} />
               </motion.button>
             </div>
@@ -224,7 +223,7 @@ export default function ChatPage() {
           {/* Quick Questions */}
           <div className="glass-card-static p-4">
             <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
-              <FiZap size={14} className="text-orange-400" /> Quick Questions
+              <FiZap size={14} className="text-primary" /> Quick Questions
             </h3>
             <div className="space-y-1.5">
               {QUICK_QUESTIONS.map((q, i) => (
@@ -247,7 +246,7 @@ export default function ChatPage() {
                   <span className="text-xs text-text-muted flex items-center gap-2">
                     <span className="text-sm">{fact.icon}</span> {fact.label}:
                   </span>
-                  <span className="text-xs font-bold text-orange-400">{fact.value}</span>
+                  <span className="text-xs font-bold text-primary">{fact.value}</span>
                 </div>
               ))}
             </div>

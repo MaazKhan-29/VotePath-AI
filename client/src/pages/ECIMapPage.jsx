@@ -61,7 +61,7 @@ const ZONES = {
 };
 
 const ZONE_COLORS = {
-  'North': { bg: 'from-amber-500/20 to-orange-500/20', border: 'border-amber-500/30', text: 'text-amber-400', dot: 'bg-amber-400' },
+  'North': { bg: 'from-indigo-500/20 to-blue-500/20', border: 'border-indigo-500/30', text: 'text-indigo-400', dot: 'bg-indigo-400' },
   'South': { bg: 'from-emerald-500/20 to-teal-500/20', border: 'border-emerald-500/30', text: 'text-emerald-400', dot: 'bg-emerald-400' },
   'East': { bg: 'from-blue-500/20 to-cyan-500/20', border: 'border-blue-500/30', text: 'text-blue-400', dot: 'bg-blue-400' },
   'West': { bg: 'from-purple-500/20 to-fuchsia-500/20', border: 'border-purple-500/30', text: 'text-purple-400', dot: 'bg-purple-400' },
@@ -116,8 +116,8 @@ export default function ECIMapPage() {
       {/* Header */}
       <motion.div variants={item} className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
-            <FiMapPin size={20} className="text-white" />
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg shadow-primary/20">
+            <span className="text-xl">🌐</span>
           </div>
           <div>
             <h1 className="text-xl font-bold text-text-primary">Interactive ECI Map</h1>
@@ -130,37 +130,21 @@ export default function ECIMapPage() {
         </a>
       </motion.div>
 
-      {/* Summary Cards */}
-      <motion.div variants={item} className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          { label: 'States & UTs', value: '36', icon: '🗺️', color: 'text-amber-400' },
-          { label: 'Lok Sabha Seats', value: totalLokSabha.toString(), icon: '🏛️', color: 'text-primary' },
-          { label: 'Total Voters', value: totalVoters, icon: '🗳️', color: 'text-secondary' },
-          { label: 'ECI Helpline', value: '1950', icon: '📞', color: 'text-accent' },
-        ].map((card, i) => (
-          <div key={i} className="glass-card-static p-4 text-center">
-            <span className="text-2xl block mb-1">{card.icon}</span>
-            <p className={`text-lg font-bold ${card.color}`}>{card.value}</p>
-            <p className="text-[10px] text-text-muted mt-0.5">{card.label}</p>
-          </div>
-        ))}
-      </motion.div>
-
       {/* Search & Zone Filter */}
       <motion.div variants={item} className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" size={14} />
+          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted z-10 pointer-events-none" size={16} />
           <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-            className="input-field pl-9 text-sm" placeholder="Search states or UTs..." />
+            style={{ paddingLeft: '2.75rem' }}
+            className="input-field text-sm w-full" placeholder="Search states or UTs..." />
         </div>
         <div className="flex gap-2 flex-wrap">
           {['All', ...Object.keys(ZONES)].map(zone => (
             <button key={zone} onClick={() => { setSelectedZone(zone); setSelectedState(null); }}
-              className={`px-3 py-2 rounded-lg text-xs font-medium transition-all border ${
-                selectedZone === zone
-                  ? 'bg-primary/15 border-primary/30 text-primary'
-                  : 'bg-bg-elevated border-border text-text-muted hover:border-primary/20 hover:text-text-secondary'
-              }`}>
+              className={`px-3 py-2 rounded-lg text-xs font-medium transition-all border ${selectedZone === zone
+                ? 'bg-primary/15 border-primary/30 text-primary'
+                : 'bg-bg-elevated border-border text-text-muted hover:border-primary/20 hover:text-text-secondary'
+                }`}>
               {zone === 'All' ? '🌐 All' : zone}
             </button>
           ))}
@@ -168,13 +152,13 @@ export default function ECIMapPage() {
       </motion.div>
 
       {/* States Map + Detail Panel */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[500px]">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Leaflet Map */}
-        <motion.div variants={item} className="lg:col-span-2 glass-card overflow-hidden h-full z-0 relative">
-          <MapContainer 
-            center={[22.5937, 78.9629]} 
-            zoom={4} 
-            style={{ height: '100%', width: '100%', background: '#12121F' }}
+        <motion.div variants={item} className="min-h-[400px] md:min-h-[500px] lg:h-[600px] xl:h-full lg:col-span-2 glass-card overflow-hidden z-0 relative">
+          <MapContainer
+            center={[22.5937, 78.9629]}
+            zoom={4.5}
+            style={{ height: '100%', width: '100%', background: 'var(--color-bg-card)' }}
             zoomControl={true}
           >
             <TileLayer
@@ -182,13 +166,13 @@ export default function ECIMapPage() {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
             <MapController selectedState={selectedState} />
-            
+
             {filteredStates.map(state => {
               const data = STATES_DATA[state];
               if (!data.coords) return null;
               return (
-                <Marker 
-                  key={state} 
+                <Marker
+                  key={state}
                   position={data.coords}
                   eventHandlers={{
                     click: () => {
@@ -270,7 +254,7 @@ export default function ECIMapPage() {
 
           {/* Quick Links Section */}
           <motion.div variants={item} className="glass-card-static p-5 flex-shrink-0">
-            <h3 className="text-lg font-bold text-orange-400 mb-4">Quick Links</h3>
+            <h3 className="text-lg font-bold text-primary mb-4">Quick Links</h3>
             <div className="space-y-2">
               {[
                 { label: 'Voter Registration Portal', icon: '📋', url: 'https://voters.eci.gov.in/' },
@@ -301,6 +285,31 @@ export default function ECIMapPage() {
             </div>
           ))}
         </div>
+      </motion.div>
+
+      {/* Summary Cards — Bottom */}
+      <motion.div variants={item} className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {[
+          { label: 'States & UTs', value: '36', icon: '🗺️', color: 'text-primary' },
+          { label: 'Lok Sabha Seats', value: totalLokSabha.toString(), icon: '🏛️', color: 'text-primary' },
+          { label: 'Total Voters', value: totalVoters, icon: '🗳️', color: 'text-secondary' },
+          { label: 'ECI Helpline', value: '1950', icon: '📞', color: 'text-secondary', isCall: true },
+        ].map((card, i) => (
+          card.isCall ? (
+            <a key={i} href="tel:1950" className="glass-card-static p-4 text-center hover:border-primary/30 transition-all">
+              <span className="text-2xl block mb-1">{card.icon}</span>
+              <p className={`text-lg font-bold ${card.color}`}>{card.value}</p>
+              <p className="text-[10px] text-text-muted mt-0.5">{card.label}</p>
+              <p className="text-[9px] text-primary mt-1">Tap to Call</p>
+            </a>
+          ) : (
+            <div key={i} className="glass-card-static p-4 text-center">
+              <span className="text-2xl block mb-1">{card.icon}</span>
+              <p className={`text-lg font-bold ${card.color}`}>{card.value}</p>
+              <p className="text-[10px] text-text-muted mt-0.5">{card.label}</p>
+            </div>
+          )
+        ))}
       </motion.div>
     </motion.div>
   );

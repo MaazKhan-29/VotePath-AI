@@ -65,7 +65,7 @@ export default function ReadinessScore() {
       </div>
 
       <p className="text-text-secondary text-sm text-center">{getMessage()}</p>
-      
+
       <div className="mt-4 w-full space-y-2">
         {[
           { label: 'Registration', done: user?.voterStatus === 'registered' },

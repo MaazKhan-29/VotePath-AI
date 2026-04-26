@@ -37,6 +37,7 @@ export const authRegister = (data) => API.post('/auth/register', data);
 export const authLogin = (data) => API.post('/auth/login', data);
 export const authGoogle = (idToken) => API.post('/auth/google', { idToken });
 export const authCompleteProfile = (data) => API.put('/auth/complete-profile', data);
+export const authUpdateProfile = (data) => API.put('/auth/update-profile', data);
 export const authGetMe = () => API.get('/auth/me');
 
 // ── User APIs ─────────────────────────────────────────────

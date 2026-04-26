@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useUser } from '../context/UserContext';
 import { getChecklist, getJourney } from '../services/api';
+import VotingJourney from '../components/VotingJourney';
+import SmartChecklist from '../components/SmartChecklist';
 import {
-  FiMap, FiCheckSquare, FiCalendar, FiMessageCircle,
-  FiMapPin, FiPlay, FiBookOpen, FiArrowRight, FiTrendingUp, FiGlobe
+  FiCalendar, FiMapPin, FiArrowRight, FiTrendingUp, FiGlobe
 } from 'react-icons/fi';
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.07 } } };
@@ -40,18 +41,38 @@ export default function OverviewPage() {
   const radius = 58;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (score / 100) * circumference;
-  const scoreColor = score >= 80 ? '#00D9A6' : score >= 50 ? '#FFB347' : '#FF6B6B';
+  const scoreColor = score >= 80 ? '#10B981' : score >= 50 ? '#3B82F6' : '#EF4444';
+
+  // Callback when checklist items are toggled — sync readiness score + task count
+  const handleChecklistUpdate = (newProgress) => {
+    setScore(newProgress.percentage);
+    setChecklistProgress({ completed: newProgress.completed, total: newProgress.total });
+  };
+
+  // Derive voter status — infer from readiness if user set "unknown"
+  const rawStatus = user?.voterStatus;
+  const derivedStatus = (rawStatus === 'unknown' || !rawStatus)
+    ? (score >= 100 ? 'ready' : score >= 50 ? 'in_progress' : 'not_started')
+    : rawStatus;
+
+  const STATUS_MAP = {
+    registered:     { label: 'Registered',      emoji: '✅', color: 'text-secondary' },
+    applied:        { label: 'Applied',          emoji: '⏳', color: 'text-blue-500' },
+    not_registered: { label: 'Not Registered',   emoji: '❌', color: 'text-red-500' },
+    ready:          { label: 'Ready to Vote',    emoji: '🎉', color: 'text-secondary' },
+    in_progress:    { label: 'In Progress',      emoji: '🔄', color: 'text-blue-500' },
+    not_started:    { label: 'Getting Started',  emoji: '🚀', color: 'text-primary' },
+  };
+  const statusInfo = STATUS_MAP[derivedStatus] || STATUS_MAP.not_started;
 
   const quickLinks = [
-    { to: '/dashboard/journey', icon: FiMap, label: 'My Journey', desc: 'View your personalized voting roadmap', color: 'from-violet-600 to-indigo-600' },
-    { to: '/dashboard/checklist', icon: FiCheckSquare, label: 'Checklist', desc: `${checklistProgress.completed}/${checklistProgress.total} tasks completed`, color: 'from-emerald-600 to-teal-600' },
-    { to: '/dashboard/timeline', icon: FiCalendar, label: 'Timeline', desc: 'View important election deadlines', color: 'from-amber-600 to-orange-600' },
-    { to: '/dashboard/chat', icon: FiMessageCircle, label: 'AI Chat', desc: 'Ask anything about voting', color: 'from-blue-600 to-cyan-600' },
-    { to: '/dashboard/booth', icon: FiMapPin, label: 'Booth Guide', desc: 'Find your polling station', color: 'from-rose-600 to-pink-600' },
-    { to: '/dashboard/eci-map', icon: FiGlobe, label: 'ECI Map', desc: 'Explore state-wise election data', color: 'from-orange-600 to-red-600' },
-    { to: '/dashboard/parliament', icon: FiMap, label: 'Parliament', desc: 'Lok Sabha & Rajya Sabha info', color: 'from-indigo-600 to-violet-600', emoji: '🏛️' },
-    { to: '/dashboard/scenarios', icon: FiPlay, label: 'Scenarios', desc: 'Simulate voter situations', color: 'from-purple-600 to-fuchsia-600' },
-    { to: '/dashboard/quiz', icon: FiBookOpen, label: 'Learn & Quiz', desc: 'Test election knowledge', color: 'from-sky-600 to-blue-600' },
+    { to: '/dashboard/timeline', iconEmoji: '📅', label: 'Timeline', desc: 'View important election deadlines', color: 'from-blue-600 to-indigo-600' },
+    { to: '/dashboard/chat', iconEmoji: '🤖', label: 'AI Chat', desc: 'Ask anything about voting', color: 'from-emerald-600 to-teal-600' },
+    { to: '/dashboard/booth', iconEmoji: '📍', label: 'Booth Guide', desc: 'Find your polling station', color: 'from-sky-600 to-blue-600' },
+    { to: '/dashboard/eci-map', iconEmoji: '🌐', label: 'ECI Map', desc: 'Explore state-wise election data', color: 'from-teal-600 to-emerald-600' },
+    { to: '/dashboard/parliament', iconEmoji: '🏛️', label: 'Parliament', desc: 'Lok Sabha & Rajya Sabha info', color: 'from-indigo-600 to-violet-600' },
+    { to: '/dashboard/scenarios', iconEmoji: '🎭', label: 'Scenarios', desc: 'Simulate voter situations', color: 'from-purple-600 to-indigo-600' },
+    { to: '/dashboard/quiz', iconEmoji: '🧠', label: 'Learn & Quiz', desc: 'Test election knowledge', color: 'from-violet-600 to-purple-600' },
   ];
 
   return (
@@ -81,9 +102,7 @@ export default function OverviewPage() {
                 🎂 Age {user?.age}
               </span>
               <span className="text-xs px-3 py-1 rounded-full bg-bg-elevated border border-border text-text-secondary">
-                {user?.voterStatus === 'registered' ? '✅ Registered' :
-                 user?.voterStatus === 'applied' ? '⏳ Applied' :
-                 user?.voterStatus === 'not_registered' ? '❌ Not Registered' : '❓ Unknown'}
+                {statusInfo.emoji} {statusInfo.label}
               </span>
               {user?.isFirstTimeVoter && (
                 <span className="text-xs px-3 py-1 rounded-full bg-primary/15 border border-primary/20 text-primary">
@@ -121,30 +140,6 @@ export default function OverviewPage() {
         </div>
       </motion.div>
 
-      {/* Quick Access Grid */}
-      <motion.div variants={item}>
-        <h2 className="text-lg font-semibold mb-4 text-text-primary">Quick Access</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          {quickLinks.map(({ to, icon: Icon, label, desc, color, emoji }) => (
-            <Link key={to} to={to}>
-              <motion.div whileHover={{ y: -3, scale: 1.01 }} whileTap={{ scale: 0.98 }}
-                className="glass-card p-4 group cursor-pointer h-full">
-                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center mb-3 shadow-lg group-hover:shadow-xl transition-shadow`}>
-                  {emoji ? <span className="text-lg">{emoji}</span> : <Icon size={18} className="text-white" />}
-                </div>
-                <h3 className="text-sm font-semibold text-text-primary group-hover:text-primary transition-colors">
-                  {label}
-                </h3>
-                <p className="text-xs text-text-muted mt-1">{desc}</p>
-                <div className="flex items-center gap-1 mt-3 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                  Open <FiArrowRight size={12} />
-                </div>
-              </motion.div>
-            </Link>
-          ))}
-        </div>
-      </motion.div>
-
       {/* Status Summary Cards */}
       <motion.div variants={item} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="glass-card-static p-4">
@@ -154,7 +149,7 @@ export default function OverviewPage() {
               <p className="text-2xl font-bold text-primary mt-1">{journeySteps}</p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <FiMap className="text-primary" size={18} />
+              <span className="text-lg">🗺️</span>
             </div>
           </div>
         </div>
@@ -167,7 +162,7 @@ export default function OverviewPage() {
               </p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center">
-              <FiCheckSquare className="text-secondary" size={18} />
+              <span className="text-lg">✅</span>
             </div>
           </div>
         </div>
@@ -175,14 +170,44 @@ export default function OverviewPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-text-muted text-xs">Voter Status</p>
-              <p className="text-sm font-semibold text-text-primary mt-1 capitalize">
-                {user?.voterStatus?.replace('_', ' ') || 'Unknown'}
+              <p className={`text-sm font-semibold mt-1 capitalize ${statusInfo.color}`}>
+                {statusInfo.emoji} {statusInfo.label}
               </p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
               <span className="text-lg">🗳️</span>
             </div>
           </div>
+        </div>
+      </motion.div>
+
+      {/* ===== JOURNEY & CHECKLIST — MERGED ===== */}
+      <motion.div variants={item} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <VotingJourney />
+        <SmartChecklist onProgressChange={handleChecklistUpdate} />
+      </motion.div>
+
+      {/* Quick Access Grid */}
+      <motion.div variants={item}>
+        <h2 className="text-lg font-semibold mb-4 text-text-primary">Quick Access</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          {quickLinks.map(({ to, iconEmoji, label, desc, color }) => (
+            <Link key={to} to={to}>
+              <motion.div whileHover={{ y: -3, scale: 1.01 }} whileTap={{ scale: 0.98 }}
+                className="glass-card p-4 group cursor-pointer h-full">
+                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center mb-3 shadow-lg group-hover:shadow-xl transition-shadow`}>
+                  <span className="text-lg">{iconEmoji}</span>
+                </div>
+                <h3 className="text-sm font-semibold text-text-primary group-hover:text-primary transition-colors">
+                  {label}
+                </h3>
+                <p className="text-xs text-text-muted mt-1">{desc}</p>
+                <div className="flex items-center gap-1 mt-3 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                  Open <FiArrowRight size={12} />
+                </div>
+              </motion.div>
+            </Link>
+          ))}
         </div>
       </motion.div>
     </motion.div>

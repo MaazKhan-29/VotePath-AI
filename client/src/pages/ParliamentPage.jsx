@@ -74,46 +74,6 @@ const HOW_PARLIAMENT_WORKS = [
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.05 } } };
 const item = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
 
-function HemicycleViz({ seats, label, color }) {
-  const rows = 8;
-  const seatsPerRow = [];
-  let remaining = seats;
-  for (let r = 0; r < rows; r++) {
-    const count = Math.min(Math.round(seats / rows) + (r < seats % rows ? 1 : 0), remaining);
-    seatsPerRow.push(count);
-    remaining -= count;
-  }
-
-  return (
-    <div className="flex flex-col items-center">
-      <div className="relative w-full max-w-xs mx-auto mb-3">
-        {seatsPerRow.map((count, rowIdx) => {
-          const radius = 60 + rowIdx * 18;
-          const angleSpread = Math.PI * 0.85;
-          const startAngle = (Math.PI - angleSpread) / 2;
-
-          return (
-            <div key={rowIdx} className="flex justify-center" style={{ height: '16px' }}>
-              <svg width="100%" height="16" viewBox={`0 0 300 80`} className="overflow-visible">
-                {Array.from({ length: count }).map((_, seatIdx) => {
-                  const angle = startAngle + (seatIdx / (count - 1 || 1)) * angleSpread;
-                  const cx = 150 + radius * Math.cos(Math.PI - angle);
-                  const cy = 70 - radius * Math.sin(angle) * 0.6;
-                  return (
-                    <circle key={seatIdx} cx={cx} cy={cy} r={2.5}
-                      className={`${color} opacity-70 hover:opacity-100 transition-opacity`}
-                      fill="currentColor" />
-                  );
-                })}
-              </svg>
-            </div>
-          );
-        })}
-      </div>
-      <p className="text-center text-xs text-text-muted">{label}</p>
-    </div>
-  );
-}
 
 function AccordionItem({ item: faqItem, isOpen, onToggle }) {
   return (
@@ -164,11 +124,10 @@ export default function ParliamentPage() {
           { key: 'rajya-sabha', label: 'Rajya Sabha', seats: '245' },
         ].map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-            className={`flex-1 py-2.5 px-4 text-sm font-medium rounded-lg transition-all ${
-              activeTab === tab.key
+            className={`flex-1 py-2.5 px-4 text-sm font-medium rounded-lg transition-all ${activeTab === tab.key
                 ? 'bg-primary text-white shadow-md shadow-primary/20'
                 : 'text-text-muted hover:text-text-primary'
-            }`}>
+              }`}>
             {tab.label} <span className="ml-1 opacity-70">({tab.seats})</span>
           </button>
         ))}
@@ -181,13 +140,18 @@ export default function ParliamentPage() {
             className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Lok Sabha Overview */}
             <div className="glass-card p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl">🏛️</span>
-                <h2 className="text-lg font-bold text-text-primary">Lok Sabha</h2>
-                <span className="ml-auto text-xs px-2 py-1 rounded-full bg-primary/15 text-primary font-medium">House of the People</span>
+              <div className="flex items-center gap-3 mb-4">
+                <img src="/assets/lok-sabha-icon.png" alt="Lok Sabha" className="w-10 h-10 object-contain drop-shadow-lg" />
+                <div>
+                  <h2 className="text-lg font-bold text-text-primary">Lok Sabha</h2>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/15 text-primary font-medium">House of the People</span>
+                </div>
               </div>
 
-              <HemicycleViz seats={120} label={`${LOK_SABHA.totalSeats} Total Seats`} color="text-primary" />
+              <div className="rounded-xl overflow-hidden border border-border/30 mb-2">
+                <img src="/assets/lok-sabha-hemicycle.png" alt="Lok Sabha Chamber" className="w-full h-auto object-cover" />
+              </div>
+              <p className="text-center text-xs text-text-muted font-medium mb-2">{LOK_SABHA.totalSeats} Total Seats</p>
 
               <div className="mt-5 space-y-2.5">
                 {[
@@ -212,8 +176,8 @@ export default function ParliamentPage() {
               </h3>
               <div className="space-y-3">
                 {LOK_SABHA.sessions.map((session, i) => {
-                  const colors = ['from-emerald-500/20 to-teal-500/20', 'from-blue-500/20 to-cyan-500/20', 'from-amber-500/20 to-orange-500/20'];
-                  const textColors = ['text-emerald-400', 'text-blue-400', 'text-amber-400'];
+                  const colors = ['from-emerald-500/20 to-teal-500/20', 'from-blue-500/20 to-cyan-500/20', 'from-violet-500/20 to-purple-500/20'];
+                  const textColors = ['text-emerald-400', 'text-blue-400', 'text-violet-400'];
                   return (
                     <div key={i} className={`p-4 rounded-xl bg-gradient-to-r ${colors[i]} border border-border/50`}>
                       <p className={`text-sm font-semibold ${textColors[i]}`}>{session}</p>
@@ -234,13 +198,18 @@ export default function ParliamentPage() {
             className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Rajya Sabha Overview */}
             <div className="glass-card p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl">🏢</span>
-                <h2 className="text-lg font-bold text-text-primary">Rajya Sabha</h2>
-                <span className="ml-auto text-xs px-2 py-1 rounded-full bg-secondary/15 text-secondary font-medium">Council of States</span>
+              <div className="flex items-center gap-3 mb-4">
+                <img src="/assets/rajya-sabha-icon.png" alt="Rajya Sabha" className="w-10 h-10 object-contain drop-shadow-lg" />
+                <div>
+                  <h2 className="text-lg font-bold text-text-primary">Rajya Sabha</h2>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary/15 text-secondary font-medium">Council of States</span>
+                </div>
               </div>
 
-              <HemicycleViz seats={80} label={`${RAJYA_SABHA.totalSeats} Total Seats`} color="text-secondary" />
+              <div className="rounded-xl overflow-hidden border border-border/30 mb-2">
+                <img src="/assets/rajya-sabha-hemicycle.png" alt="Rajya Sabha Chamber" className="w-full h-auto object-cover" />
+              </div>
+              <p className="text-center text-xs text-text-muted font-medium mb-2">{RAJYA_SABHA.totalSeats} Total Seats</p>
 
               <div className="mt-5 space-y-2.5">
                 {[
