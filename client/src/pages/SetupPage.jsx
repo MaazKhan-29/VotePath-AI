@@ -67,12 +67,12 @@ export default function SetupPage() {
         className="relative z-10 w-full max-w-lg">
 
         <div className="glass-card overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-primary via-purple-500 to-secondary" />
+          <div className="h-1 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
 
           <div className="p-8">
             {/* Header */}
             <div className="text-center mb-7">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center mx-auto mb-3 text-xl shadow-xl shadow-primary/20">
+              <div className="w-14 h-14 rounded-2xl bg-bg-elevated flex items-center justify-center mx-auto mb-3 text-xl shadow-xl shadow-primary/20">
                 👤
               </div>
               <h2 className="text-xl font-bold gradient-text">Complete Your Profile</h2>
@@ -86,7 +86,7 @@ export default function SetupPage() {
               {user?.avatar ? (
                 <img src={user.avatar} alt="" className="w-9 h-9 rounded-full" />
               ) : (
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-sm font-bold text-white">
+                <div className="w-9 h-9 rounded-full bg-bg-elevated border border-border flex items-center justify-center text-sm font-bold text-primary">
                   {user?.name?.charAt(0)?.toUpperCase()}
                 </div>
               )}

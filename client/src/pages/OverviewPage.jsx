@@ -66,13 +66,13 @@ export default function OverviewPage() {
   const statusInfo = STATUS_MAP[derivedStatus] || STATUS_MAP.not_started;
 
   const quickLinks = [
-    { to: '/dashboard/timeline', iconEmoji: '📅', label: 'Timeline', desc: 'View important election deadlines', color: 'from-blue-600 to-indigo-600' },
-    { to: '/dashboard/chat', iconEmoji: '🤖', label: 'AI Chat', desc: 'Ask anything about voting', color: 'from-emerald-600 to-teal-600' },
-    { to: '/dashboard/booth', iconEmoji: '📍', label: 'Booth Guide', desc: 'Find your polling station', color: 'from-sky-600 to-blue-600' },
-    { to: '/dashboard/eci-map', iconEmoji: '🌐', label: 'ECI Map', desc: 'Explore state-wise election data', color: 'from-teal-600 to-emerald-600' },
-    { to: '/dashboard/parliament', iconEmoji: '🏛️', label: 'Parliament', desc: 'Lok Sabha & Rajya Sabha info', color: 'from-indigo-600 to-violet-600' },
-    { to: '/dashboard/scenarios', iconEmoji: '🎭', label: 'Scenarios', desc: 'Simulate voter situations', color: 'from-purple-600 to-indigo-600' },
-    { to: '/dashboard/quiz', iconEmoji: '🧠', label: 'Learn & Quiz', desc: 'Test election knowledge', color: 'from-violet-600 to-purple-600' },
+    { to: '/dashboard/timeline', iconEmoji: '📅', label: 'Timeline', desc: 'View important election deadlines', color: 'from-[#FF9933] to-[#E65100]' },
+    { to: '/dashboard/chat', iconEmoji: '🤖', label: 'AI Chat', desc: 'Ask anything about voting', color: 'from-[#138808] to-[#1B5E20]' },
+    { to: '/dashboard/booth', iconEmoji: '📍', label: 'Booth Guide', desc: 'Find your polling station', color: 'from-[#000080] to-[#1A237E]' },
+    { to: '/dashboard/eci-map', iconEmoji: '🌐', label: 'ECI Map', desc: 'Explore state-wise election data', color: 'from-[#1B5E20] to-[#138808]' },
+    { to: '/dashboard/parliament', iconEmoji: '🏛️', label: 'Parliament', desc: 'Lok Sabha & Rajya Sabha info', color: 'from-[#E65100] to-[#FF9933]' },
+    { to: '/dashboard/scenarios', iconEmoji: '🎭', label: 'Scenarios', desc: 'Simulate voter situations', color: 'from-[#FF9933] via-white to-[#138808]' },
+    { to: '/dashboard/quiz', iconEmoji: '🧠', label: 'Learn & Quiz', desc: 'Test election knowledge', color: 'from-[#000080] to-[#E65100]' },
   ];
 
   return (
@@ -116,9 +116,16 @@ export default function OverviewPage() {
           <div className="flex flex-col items-center">
             <div className="progress-ring-container">
               <svg width="136" height="136" viewBox="0 0 136 136">
+                <defs>
+                  <linearGradient id="tricolorRing" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#FF9933" />
+                    <stop offset="50%" stopColor="#FFFFFF" />
+                    <stop offset="100%" stopColor="#138808" />
+                  </linearGradient>
+                </defs>
                 <circle cx="68" cy="68" r={radius} fill="none" className="progress-ring-bg" strokeWidth="7" />
                 <motion.circle cx="68" cy="68" r={radius} fill="none"
-                  stroke={scoreColor} strokeWidth="7" strokeLinecap="round"
+                  stroke="url(#tricolorRing)" strokeWidth="7" strokeLinecap="round"
                   strokeDasharray={circumference}
                   initial={{ strokeDashoffset: circumference }}
                   animate={{ strokeDashoffset: offset }}
@@ -126,7 +133,7 @@ export default function OverviewPage() {
                   className="progress-ring-fill" />
               </svg>
               <div className="absolute text-center">
-                <motion.span className="text-2xl font-bold" style={{ color: scoreColor }}
+                <motion.span className="text-2xl font-bold gradient-text"
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
                   {score}%
                 </motion.span>
@@ -195,7 +202,7 @@ export default function OverviewPage() {
             <Link key={to} to={to}>
               <motion.div whileHover={{ y: -3, scale: 1.01 }} whileTap={{ scale: 0.98 }}
                 className="glass-card p-4 group cursor-pointer h-full">
-                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center mb-3 shadow-lg group-hover:shadow-xl transition-shadow`}>
+                <div className={`w-10 h-10 rounded-xl bg-bg-elevated flex items-center justify-center mb-3 shadow-lg group-hover:shadow-xl transition-shadow`}>
                   <span className="text-lg">{iconEmoji}</span>
                 </div>
                 <h3 className="text-sm font-semibold text-text-primary group-hover:text-primary transition-colors">

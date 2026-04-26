@@ -11,12 +11,12 @@ const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { st
 const fadeUp = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 
 const FEATURES = [
-  { icon: <FiZap />, title: 'Personalized Journey', desc: 'AI creates YOUR unique voting roadmap based on your profile and location.', gradient: 'from-violet-500 to-indigo-500' },
-  { icon: <FiCheckCircle />, title: 'Smart Checklist', desc: 'Track every step — from registration to election day with readiness scores.', gradient: 'from-emerald-500 to-teal-500' },
-  { icon: <FiCpu />, title: 'Gemini AI Chat', desc: 'Get instant answers in English or Hindi, powered by Google Gemini.', gradient: 'from-blue-500 to-cyan-500' },
-  { icon: <FiShield />, title: 'Neutral & Official', desc: 'Based entirely on ECI processes — zero political bias, 100% factual.', gradient: 'from-purple-500 to-pink-500' },
-  { icon: <FiMapPin />, title: 'Booth Finder', desc: 'Locate your polling station, know what to carry, and booth timings.', gradient: 'from-rose-500 to-red-500' },
-  { icon: <FiMap />, title: 'India ECI Map', desc: 'Explore state-wise election data, voter statistics, and constituency info.', gradient: 'from-amber-500 to-orange-500' },
+  { icon: <FiZap />, title: 'Personalized Journey', desc: 'AI creates YOUR unique voting roadmap based on your profile and location.', gradient: 'from-[#FF9933] to-[#E65100]' },
+  { icon: <FiCheckCircle />, title: 'Smart Checklist', desc: 'Track every step — from registration to election day with readiness scores.', gradient: 'from-[#138808] to-[#1B5E20]' },
+  { icon: <FiCpu />, title: 'Gemini AI Chat', desc: 'Get instant answers in English or Hindi, powered by Google Gemini.', gradient: 'from-[#000080] to-[#1A237E]' },
+  { icon: <FiShield />, title: 'Neutral & Official', desc: 'Based entirely on ECI processes — zero political bias, 100% factual.', gradient: 'from-[#FF9933] via-white to-[#138808]' },
+  { icon: <FiMapPin />, title: 'Booth Finder', desc: 'Locate your polling station, know what to carry, and booth timings.', gradient: 'from-[#E65100] to-[#BF360C]' },
+  { icon: <FiMap />, title: 'India ECI Map', desc: 'Explore state-wise election data, voter statistics, and constituency info.', gradient: 'from-[#1B5E20] to-[#138808]' },
 ];
 
 const STATS = [
@@ -76,7 +76,7 @@ export default function LandingPage() {
       <header className="sticky top-0 z-40 bg-bg-card/80 backdrop-blur-xl border-b border-border/50 shadow-sm">
         <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-sm shadow-lg shadow-primary/20">
+            <div className="w-9 h-9 rounded-xl bg-bg-elevated flex items-center justify-center text-sm shadow-lg shadow-primary/20">
               🗳️
             </div>
             <div>
@@ -187,7 +187,7 @@ export default function LandingPage() {
             {FEATURES.map((f, i) => (
               <motion.div key={i} variants={fadeUp}
                 className="glass-card p-6 group hover:border-primary/30 transition-all">
-                <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${f.gradient} flex items-center justify-center mb-4 text-white shadow-lg group-hover:scale-110 transition-transform`}>
+                <div className={`w-11 h-11 rounded-xl bg-bg-elevated flex items-center justify-center mb-4 text-primary shadow-lg group-hover:scale-110 transition-transform`}>
                   {f.icon}
                 </div>
                 <h3 className="font-bold text-sm text-text-primary mb-1.5">{f.title}</h3>
@@ -288,7 +288,7 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
             className="glass-card p-8 sm:p-12 border-primary/20">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mx-auto mb-5 text-2xl shadow-xl shadow-primary/25">
+            <div className="w-16 h-16 rounded-2xl bg-bg-elevated flex items-center justify-center mx-auto mb-5 text-2xl shadow-xl">
               🗳️
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-text-primary mb-3">
@@ -320,7 +320,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-xs shadow-md">🗳️</div>
+                <div className="w-8 h-8 rounded-lg bg-bg-elevated flex items-center justify-center text-xs shadow-md">🗳️</div>
                 <span className="text-sm font-bold gradient-text">VotePath AI</span>
               </div>
               <p className="text-xs text-text-muted leading-relaxed">

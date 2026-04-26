@@ -108,7 +108,7 @@ export default function ParliamentPage() {
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
       {/* Header */}
       <motion.div variants={item} className="flex items-center gap-3">
-        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+        <div className="w-11 h-11 rounded-xl bg-bg-elevated flex items-center justify-center shadow-lg shadow-primary/20">
           <span className="text-xl">🏛️</span>
         </div>
         <div>
@@ -176,11 +176,13 @@ export default function ParliamentPage() {
               </h3>
               <div className="space-y-3">
                 {LOK_SABHA.sessions.map((session, i) => {
-                  const colors = ['from-emerald-500/20 to-teal-500/20', 'from-blue-500/20 to-cyan-500/20', 'from-violet-500/20 to-purple-500/20'];
-                  const textColors = ['text-emerald-400', 'text-blue-400', 'text-violet-400'];
+                  const icons = ['🌸', '🌧️', '❄️'];
                   return (
-                    <div key={i} className={`p-4 rounded-xl bg-gradient-to-r ${colors[i]} border border-border/50`}>
-                      <p className={`text-sm font-semibold ${textColors[i]}`}>{session}</p>
+                    <div key={i} className="p-3.5 rounded-xl bg-bg-elevated border border-border/50">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-base">{icons[i]}</span>
+                        <h4 className="text-sm font-semibold text-text-primary">{session}</h4>
+                      </div>
                     </div>
                   );
                 })}

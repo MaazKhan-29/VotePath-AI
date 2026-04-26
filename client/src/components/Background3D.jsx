@@ -39,7 +39,7 @@ function Particles({ isDarkMode }) {
       </bufferGeometry>
       <pointsMaterial
         size={0.015}
-        color={isDarkMode ? "#60A5FA" : "#93C5FD"}
+        color={isDarkMode ? "#FF9933" : "#E65100"}
         transparent
         opacity={isDarkMode ? 0.6 : 0.8}
         sizeAttenuation={true}
@@ -53,7 +53,7 @@ export default function Background3D({ isDarkMode }) {
   return (
     <div className="fixed inset-0 z-[-1] pointer-events-none transition-colors duration-500">
       <Canvas camera={{ position: [0, 0, 2.5] }}>
-        <fog attach="fog" args={[isDarkMode ? '#05050A' : '#F3F4F6', 1, 4]} />
+        <fog attach="fog" args={[isDarkMode ? '#0A0A0A' : '#FFFAF5', 1, 4]} />
         <Particles isDarkMode={isDarkMode} />
       </Canvas>
     </div>

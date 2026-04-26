@@ -27,8 +27,8 @@ export default function BoothPage() {
       {/* Header */}
       <motion.div variants={item} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg shadow-primary/20">
-            <FiMapPin size={20} className="text-white" />
+          <div className="w-11 h-11 rounded-xl bg-bg-elevated flex items-center justify-center shadow-lg shadow-primary/20">
+            <FiMapPin size={20} className="text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-text-primary">Booth Guide</h1>

@@ -136,7 +136,7 @@ export default function ChatPage() {
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg shadow-primary/20">
+          <div className="w-10 h-10 rounded-xl bg-bg-elevated flex items-center justify-center shadow-lg shadow-primary/20">
             <span className="text-lg">🤖</span>
           </div>
           <div>
@@ -169,7 +169,7 @@ export default function ChatPage() {
                   initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                   className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   {msg.role === 'assistant' && (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0 text-sm shadow-md">
+                    <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center flex-shrink-0 text-sm shadow-md">
                       🤖
                     </div>
                   )}
@@ -184,7 +184,7 @@ export default function ChatPage() {
 
             {sending && (
               <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0 text-sm">
+                <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center flex-shrink-0 text-sm">
                   🤖
                 </div>
                 <div className="chat-bubble-assistant">
@@ -210,7 +210,7 @@ export default function ChatPage() {
                 placeholder="Ask about elections | चुनाव के बारे में पूछें" />
               <motion.button onClick={() => handleSend()} disabled={sending || !input.trim()}
                 whileTap={{ scale: 0.9 }}
-                className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white shadow-lg shadow-primary/20 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity hover:shadow-xl">
+                className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity hover:shadow-xl">
                 <FiSend size={16} />
               </motion.button>
             </div>

@@ -13,7 +13,7 @@ export default function ScenarioPage() {
       {/* Page Header */}
       <div>
         <div className="flex items-center gap-3 mb-1">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-purple-500/20 text-xl">
+          <div className="w-11 h-11 rounded-xl bg-bg-elevated flex items-center justify-center shadow-lg shadow-primary/20 text-xl">
             🎭
           </div>
           <div>
@@ -27,9 +27,9 @@ export default function ScenarioPage() {
       <motion.div variants={container} initial="hidden" animate="show"
         className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[
-          { icon: <FiZap size={14} />, title: 'AI-Powered', desc: 'Solutions based on actual ECI guidelines', color: 'text-primary', bg: 'bg-primary/10 border-primary/20' },
-          { icon: <FiShield size={14} />, title: 'Verified Steps', desc: 'Each step links to official portals', color: 'text-secondary', bg: 'bg-secondary/10 border-secondary/20' },
-          { icon: <FiInfo size={14} />, title: 'Learn by Doing', desc: 'Practice scenarios before election day', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20' },
+          { icon: <FiZap size={14} />, title: 'AI-Powered', desc: 'Solutions based on actual ECI guidelines', color: 'text-primary', bg: 'bg-bg-elevated border-primary/20' },
+          { icon: <FiShield size={14} />, title: 'Verified Steps', desc: 'Each step links to official portals', color: 'text-secondary', bg: 'bg-bg-elevated border-secondary/20' },
+          { icon: <FiInfo size={14} />, title: 'Learn by Doing', desc: 'Practice scenarios before election day', color: 'text-primary', bg: 'bg-bg-elevated border-primary/20' },
         ].map((item, i) => (
           <motion.div key={i} variants={fadeUp}
             className={`flex items-start gap-3 p-4 rounded-xl border ${item.bg}`}>

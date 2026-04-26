@@ -118,14 +118,14 @@ export default function ScenarioSimulator() {
                   className="relative space-y-0">
 
                   {/* Vertical Line */}
-                  <div className="absolute left-[15px] top-4 bottom-4 w-0.5 bg-gradient-to-b from-primary via-purple-500 to-secondary rounded-full" />
+                  <div className="absolute left-[15px] top-4 bottom-4 w-0.5 bg-gradient-to-b from-[#FF9933] via-white to-[#138808] rounded-full" />
 
                   {result.steps?.map((step, i) => (
                     <motion.div key={i} variants={fadeUp}
                       className="relative flex gap-4 pb-5 last:pb-0">
                       {/* Step Number Circle */}
                       <div className="relative z-10 flex-shrink-0">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-md shadow-primary/20">
+                        <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center shadow-md shadow-primary/20">
                           <span className="text-xs font-bold text-white">{step.number || i + 1}</span>
                         </div>
                       </div>

@@ -102,7 +102,7 @@ export default function AuthPage() {
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center mx-auto mb-4 text-2xl shadow-xl shadow-primary/20">
+          <div className="w-14 h-14 rounded-2xl bg-bg-elevated flex items-center justify-center mx-auto mb-4 text-2xl shadow-xl shadow-primary/20">
             🗳️
           </div>
           <h1 className="text-2xl font-bold gradient-text">VotePath AI</h1>
@@ -111,7 +111,7 @@ export default function AuthPage() {
 
         {/* Auth Card */}
         <div className="glass-card overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-primary via-purple-500 to-secondary" />
+          <div className="h-1 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
 
           <div className="p-7">
             {/* Tab Switcher */}

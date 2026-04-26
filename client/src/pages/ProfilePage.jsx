@@ -64,7 +64,7 @@ export default function ProfilePage() {
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6 max-w-2xl mx-auto">
       {/* Header */}
       <motion.div variants={item} className="flex items-center gap-3">
-        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg shadow-primary/20">
+        <div className="w-11 h-11 rounded-xl bg-bg-elevated flex items-center justify-center shadow-lg shadow-primary/20">
           <span className="text-xl">👤</span>
         </div>
         <div>
@@ -82,7 +82,7 @@ export default function ProfilePage() {
           {user?.avatar ? (
             <img src={user.avatar} alt="" className="w-16 h-16 rounded-2xl border-2 border-border shadow-md" />
           ) : (
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl font-bold text-white shadow-md">
+            <div className="w-16 h-16 rounded-2xl bg-bg-elevated border border-border flex items-center justify-center text-2xl font-bold text-primary shadow-md">
               {user?.name?.charAt(0)?.toUpperCase()}
             </div>
           )}

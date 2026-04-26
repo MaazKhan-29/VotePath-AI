@@ -48,7 +48,7 @@ export default function DashboardLayout() {
     user?.avatar ? (
       <img src={user.avatar} alt="" className={`${size} rounded-full object-cover shadow-sm`} referrerPolicy="no-referrer" />
     ) : (
-      <div className={`${size} rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center ${textSize} font-bold text-white shadow-sm`}>
+      <div className={`${size} rounded-full bg-bg-elevated border border-border flex items-center justify-center ${textSize} font-bold text-primary shadow-sm`}>
         {user?.name?.charAt(0)?.toUpperCase()}
       </div>
     )
@@ -64,7 +64,7 @@ export default function DashboardLayout() {
           
           {/* Left: Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-lg shadow-md shadow-primary/20 text-white">
+            <div className="w-9 h-9 rounded-xl bg-bg-elevated flex items-center justify-center text-lg shadow-md shadow-primary/20 text-white">
               🗳️
             </div>
             <div className="hidden sm:block">
@@ -150,7 +150,7 @@ export default function DashboardLayout() {
             >
               <div className="p-5 border-b border-border flex items-center justify-between bg-bg-elevated/50">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-base shadow-md text-white">
+                  <div className="w-9 h-9 rounded-xl bg-bg-elevated flex items-center justify-center text-base shadow-md text-white">
                     🗳️
                   </div>
                   <div>
