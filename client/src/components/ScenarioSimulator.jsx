@@ -126,7 +126,7 @@ export default function ScenarioSimulator() {
                       {/* Step Number Circle */}
                       <div className="relative z-10 flex-shrink-0">
                         <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center shadow-md shadow-primary/20">
-                          <span className="text-xs font-bold text-white">{step.number || i + 1}</span>
+                          <span className="text-xs font-bold text-text-primary">{step.number || i + 1}</span>
                         </div>
                       </div>
 
