@@ -4,6 +4,7 @@
   "description": "VotePath AI Backend Server",
   "main": "index.js",
   "scripts": {
+    "build": "echo 'No build step required for backend'",
     "dev": "node server.js",
     "start": "node server.js",
     "logs": "firebase functions:log"
