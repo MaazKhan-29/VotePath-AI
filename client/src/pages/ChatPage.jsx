@@ -32,6 +32,7 @@ export default function ChatPage() {
   const [sending, setSending] = useState(false);
   const [voiceOn, setVoiceOn] = useState(false);
   const chatEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const inputRef = useRef(null);
 
   // Load chat history
@@ -58,8 +59,12 @@ export default function ChatPage() {
   }, [user]);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    // Scroll only the chat messages container (not the outer page)
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [messages, sending]);
 
   const speak = (text) => {
     if (!voiceOn || !window.speechSynthesis) return;
@@ -224,7 +229,7 @@ export default function ChatPage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-      className="h-[calc(100vh-8rem)]" role="main" id="main-content" aria-label="AI Chat Assistant">
+      className="h-full overflow-hidden" role="main" id="main-content" aria-label="AI Chat Assistant">
 
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
@@ -256,7 +261,7 @@ export default function ChatPage() {
           <div className="h-0.5 bg-gradient-to-r from-primary via-secondary to-primary-glow" />
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-4 chat-scroll-hide" role="log" aria-live="polite" aria-label="Chat messages">
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-5 space-y-4 chat-scroll-hide" role="log" aria-live="polite" aria-label="Chat messages">
             <AnimatePresence>
               {messages.map((msg, i) => (
                 <motion.div key={i}
