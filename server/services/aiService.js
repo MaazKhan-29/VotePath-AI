@@ -88,33 +88,11 @@ class AIService {
       }
     }
 
-    // Step 2: Try Gemini (primary)
-    if (!this._isOnCooldown('gemini')) {
-      try {
-        const health = await this.checkHealth();
-        if (health.gemini) {
-          const result = await this._timedGenerate('gemini', prompt, systemPrompt);
-
-          if (useCache) {
-            const hash = cacheService.generateHash(prompt, systemPrompt);
-            await cacheService.set(hash, result.content, 'gemini').catch(() => {});
-          }
-
-          this.stats.geminiSuccess++;
-          return { ...result, content: this._cleanResponse(result.content), cached: false };
-        }
-      } catch (error) {
-        this.stats.geminiFailures++;
-        this._setCooldown('gemini', error);
-        console.error(`❌ Gemini failed (cooldown ${Math.round(this.cooldownDuration / 1000)}s):`, error.message);
-      }
-    }
-
-    // Step 3: Try Mistral (fallback)
+    // Step 2: Try Mistral AI (PRIMARY — larger quota)
     if (!this._isOnCooldown('mistral')) {
       try {
         if (mistralService.isAvailable()) {
-          console.log('🤖 Switching to Mistral AI...');
+          console.log('🤖 Using Mistral AI (primary)...');
           const result = await this._timedGenerate('mistral', prompt, systemPrompt);
 
           if (useCache) {
@@ -128,7 +106,30 @@ class AIService {
       } catch (error) {
         this.stats.mistralFailures++;
         this._setCooldown('mistral', error);
-        console.error(`❌ Mistral failed:`, error.message);
+        console.error(`❌ Mistral failed (cooldown ${Math.round(this.cooldownDuration / 1000)}s):`, error.message);
+      }
+    }
+
+    // Step 3: Try Gemini (fallback)
+    if (!this._isOnCooldown('gemini')) {
+      try {
+        const health = await this.checkHealth();
+        if (health.gemini) {
+          console.log('☁️ Falling back to Gemini...');
+          const result = await this._timedGenerate('gemini', prompt, systemPrompt);
+
+          if (useCache) {
+            const hash = cacheService.generateHash(prompt, systemPrompt);
+            await cacheService.set(hash, result.content, 'gemini').catch(() => {});
+          }
+
+          this.stats.geminiSuccess++;
+          return { ...result, content: this._cleanResponse(result.content), cached: false };
+        }
+      } catch (error) {
+        this.stats.geminiFailures++;
+        this._setCooldown('gemini', error);
+        console.error(`❌ Gemini failed:`, error.message);
       }
     }
 
