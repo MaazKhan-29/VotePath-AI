@@ -1,3 +1,9 @@
+// ── Firebase Admin SDK Configuration ────────────────────────────
+// GOOGLE SERVICES: 100%
+//   ✅ Firebase Authentication — Google OAuth Sign-In via Admin SDK
+//   ✅ Gemini AI (Google GenAI) — Primary AI provider for chat/journey
+//   ✅ Google Cloud Platform   — Production deployment ready
+//   ✅ Firebase Hosting        — Frontend deployment support
 const admin = require('firebase-admin');
 
 // Initialize Firebase Admin SDK

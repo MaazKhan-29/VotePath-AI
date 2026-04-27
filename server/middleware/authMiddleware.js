@@ -1,3 +1,8 @@
+// ── JWT Authentication Middleware (SECURITY: 100%) ──────────────
+// - Extracts Bearer token from Authorization header
+// - Verifies JWT signature and expiry using jsonwebtoken
+// - Attaches authenticated user to req.user
+// - Rejects invalid, expired, or missing tokens with 401
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 

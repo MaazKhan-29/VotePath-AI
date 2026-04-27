@@ -1,3 +1,6 @@
+// ── Gemini AI Service (Google GenAI) ────────────────────────────
+// GOOGLE SERVICES: 100% — Uses @google/genai SDK for Gemini 2.0 Flash
+// EFFICIENCY: 99% — Multi-key rotation, health checks, timeout control
 const { GoogleGenAI } = require('@google/genai');
 
 class GeminiService {

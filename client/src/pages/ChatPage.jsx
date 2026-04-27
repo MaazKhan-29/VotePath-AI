@@ -99,46 +99,127 @@ export default function ChatPage() {
     handleSend(q);
   };
 
-  // Clean markdown rendering — strips asterisks, renders headings, bullets
+  // ── Premium Markdown Renderer ─────────────────────────────────
+  // Strips asterisks, renders headings, bullets, links, and
+  // callout boxes for a polished chat experience
   const renderContent = (text) => {
     // Pre-process: strip all asterisks from the entire text
     const cleaned = text
-      // Convert **Heading** on its own line → ## Heading
       .replace(/^\*\*(.+?)\*\*\s*$/gm, '## $1')
-      // Remove all remaining ** bold markers
       .replace(/\*\*(.+?)\*\*/g, '$1')
-      // Remove all single * italic markers (but not bullet •)
       .replace(/\*([^*\n]+)\*/g, '$1')
-      // Convert * list items → • bullets
       .replace(/^\*\s+/gm, '• ')
-      // Final cleanup: remove any stray asterisks
       .replace(/\*\*/g, '');
 
-    return cleaned.split('\n').map((line, i) => {
-      // Headers (## or ###)
-      if (line.startsWith('### ')) {
-        return <h4 key={i} className="text-sm font-bold text-primary mt-2 mb-1">{line.replace('### ', '')}</h4>;
-      }
-      if (line.startsWith('## ')) {
-        return <h3 key={i} className="text-base font-bold text-primary mt-2 mb-1">{line.replace('## ', '')}</h3>;
-      }
+    const lines = cleaned.split('\n');
+    const elements = [];
+    let bulletGroup = [];
 
-      // Bullet points
-      if (line.startsWith('• ') || line.startsWith('- ')) {
-        return (
-          <div key={i} className="flex gap-2 ml-1">
-            <span className="text-primary mt-0.5">•</span>
-            <span>{line.replace(/^[•\-]\s*/, '')}</span>
+    const flushBullets = () => {
+      if (bulletGroup.length > 0) {
+        elements.push(
+          <div key={`bg-${elements.length}`} className="chat-bullet-group">
+            {bulletGroup.map((b, j) => (
+              <div key={j} className="chat-bullet-item">
+                <span className="chat-bullet-dot">•</span>
+                <span>{renderInlineLinks(b)}</span>
+              </div>
+            ))}
           </div>
         );
+        bulletGroup = [];
+      }
+    };
+
+    // Render inline links (https://...)
+    const renderInlineLinks = (text) => {
+      const parts = text.split(/(https?:\/\/[^\s,)]+)/g);
+      return parts.map((part, i) => {
+        if (part.match(/^https?:\/\//)) {
+          const label = part.replace(/^https?:\/\//, '').replace(/\/$/, '');
+          return (
+            <a key={i} href={part} target="_blank" rel="noreferrer"
+              className="chat-link">
+              {label.length > 30 ? label.slice(0, 30) + '…' : label} ↗
+            </a>
+          );
+        }
+        return part;
+      });
+    };
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // Bullet points — collect into a group
+      if (line.startsWith('• ') || line.startsWith('- ')) {
+        bulletGroup.push(line.replace(/^[•\-]\s*/, ''));
+        continue;
       }
 
-      // Empty line = spacer
-      if (line.trim() === '') return <p key={i} className="h-2" />;
+      // Flush any pending bullets before rendering non-bullet
+      flushBullets();
+
+      // 👉 Next Step callout
+      if (line.startsWith('👉')) {
+        elements.push(
+          <div key={i} className="chat-callout">
+            <span className="chat-callout-icon">👉</span>
+            <span>{renderInlineLinks(line.replace(/^👉\s*/, ''))}</span>
+          </div>
+        );
+        continue;
+      }
+
+      // ## Heading with emoji
+      if (line.startsWith('## ')) {
+        const headingText = line.replace('## ', '');
+        elements.push(
+          <div key={i} className="chat-heading">
+            {headingText}
+          </div>
+        );
+        continue;
+      }
+
+      // ### Sub-heading
+      if (line.startsWith('### ')) {
+        elements.push(
+          <div key={i} className="chat-subheading">
+            {line.replace('### ', '')}
+          </div>
+        );
+        continue;
+      }
+
+      // Numbered steps (1. 2. 3.)
+      const stepMatch = line.match(/^(\d+)[.)]\s+(.*)/);
+      if (stepMatch) {
+        elements.push(
+          <div key={i} className="chat-step">
+            <span className="chat-step-num">{stepMatch[1]}</span>
+            <span>{renderInlineLinks(stepMatch[2])}</span>
+          </div>
+        );
+        continue;
+      }
+
+      // Empty line → spacer
+      if (line.trim() === '') {
+        elements.push(<div key={i} className="h-1.5" />);
+        continue;
+      }
 
       // Normal paragraph
-      return <p key={i}>{line}</p>;
-    });
+      elements.push(
+        <p key={i} className="chat-paragraph">
+          {renderInlineLinks(line)}
+        </p>
+      );
+    }
+
+    flushBullets();
+    return elements;
   };
 
   return (

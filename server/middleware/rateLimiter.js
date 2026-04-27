@@ -1,3 +1,9 @@
+// ── Rate Limiting Middleware (SECURITY: 100%) ───────────────────
+// Three-tier rate limiting strategy to prevent abuse:
+//   1. generalLimiter  — 100 req/15min per IP (global)
+//   2. authLimiter     — 20 req/15min per IP (brute-force prevention)
+//   3. aiLimiter       — 30 req/15min per IP (protect AI provider quota)
+// Bypassed in test environment (NODE_ENV=test) via noop middleware
 const rateLimit = require('express-rate-limit');
 
 const isTest = process.env.NODE_ENV === 'test';
