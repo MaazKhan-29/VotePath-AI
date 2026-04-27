@@ -134,6 +134,142 @@ npm run dev
 
 ---
 
+## 🧪 Testing
+
+VotePath AI includes a comprehensive test suite built with **Jest** and **Supertest**, using **MongoDB Memory Server** for isolated, zero-config test execution.
+
+```bash
+# Run all tests
+cd server && npm test
+
+# Run with coverage report
+npm run test:coverage
+
+# Run verbose (detailed output)
+npm run test:verbose
+```
+
+### Test Coverage
+
+| Category | Tests | What's Covered |
+|----------|-------|----------------|
+| **Auth API** | 15 | Registration, login, Google auth, JWT validation, profile completion |
+| **Chat API** | 8 | Message sending, history, AI response, error handling |
+| **Quiz API** | 6 | Question fetch, scoring, validation |
+| **Journey API** | 3 | Personalized generation, user validation |
+| **Scenario API** | 5 | Scenario listing, execution, fallbacks |
+| **Booth API** | 3 | Booth guidance, geolocation |
+| **Edge Cases** | 12 | XSS, NoSQL injection, long inputs, concurrency |
+| **AI Fallback** | 9 | Gemini unavailable, cache, key rotation |
+| **Integration** | 4 | Full user journey, complete auth flow |
+| **Total** | **65+** | |
+
+---
+
+## 🔒 Security
+
+Production-grade security is implemented across the entire stack:
+
+| Layer | Implementation |
+|-------|---------------|
+| **Authentication** | JWT tokens + Firebase Admin SDK verification |
+| **Password Security** | bcryptjs hashing with salt rounds |
+| **API Protection** | Tiered rate limiting (100/15min general, 20/15min auth, 30/15min AI) |
+| **HTTP Headers** | Helmet.js (HSTS, XSS protection, content-type sniffing) |
+| **NoSQL Injection** | express-mongo-sanitize on all inputs |
+| **Payload Limits** | 1MB request body limit |
+| **CORS** | Whitelist-only origin policy |
+| **Error Sanitization** | No stack traces or internal details in production |
+
+---
+
+## ♿ Accessibility (WCAG 2.1 Compliance)
+
+VotePath AI prioritizes inclusive design:
+
+- ✅ **Skip-to-content link** for keyboard navigation
+- ✅ **Semantic HTML** (`<main>`, `<nav>`, `<section>`, `<article>`, `<aside>`)
+- ✅ **ARIA attributes** on all interactive elements (`aria-label`, `aria-live`, `role`)
+- ✅ **Focus-visible outlines** for keyboard users
+- ✅ **Screen reader support** (`sr-only` class, `aria-live` regions)
+- ✅ **Reduced motion** support (`prefers-reduced-motion` media query)
+- ✅ **High contrast mode** support (`prefers-contrast` media query)
+- ✅ **Form accessibility** — all inputs linked to labels via `htmlFor`/`id`
+- ✅ **Color contrast** — WCAG AA compliant (4.5:1 minimum)
+
+---
+
+## 📊 Analytics & Intelligence
+
+VotePath AI implements a data-driven analytics engine that logs every AI interaction:
+
+- **Query Categorization:** Auto-categorizes queries into 12+ topic buckets (registration, voter ID, booth, EVM, NRI, etc.)
+- **User Insights:** Personalized analytics showing query history, top topics, engagement level
+- **Smart Recommendations:** AI-driven suggestions based on unexplored topics
+- **Performance Metrics:** Response time tracking, cache hit rates, provider usage
+- **Global Statistics:** Aggregated platform-wide query trends
+
+### API Endpoints
+```
+GET /api/analytics/insights/:userId    — Personal insights
+GET /api/analytics/recommendations/:userId — Smart recommendations  
+GET /api/analytics/stats               — Global statistics
+```
+
+---
+
+## 📁 Project Structure
+
+```
+votepath-ai/
+├── client/                    # React Frontend (Vite)
+│   ├── src/
+│   │   ├── components/        # Reusable UI components
+│   │   ├── pages/             # Route-level pages
+│   │   ├── context/           # React Context providers
+│   │   ├── services/          # API service layer
+│   │   └── config/            # Firebase client config
+│   └── index.html
+├── server/                    # Express Backend
+│   ├── __tests__/             # Jest test suite
+│   │   ├── api/               # API endpoint tests
+│   │   ├── edge-cases/        # Edge case & security tests
+│   │   └── integration/       # End-to-end flow tests
+│   ├── controllers/           # Route handlers
+│   ├── middleware/             # Auth, rate limiting, errors
+│   ├── models/                # Mongoose schemas
+│   ├── routes/                # Express route definitions
+│   ├── services/              # AI, cache, analytics services
+│   └── config/                # DB & Firebase config
+└── README.md
+```
+
+---
+
+## 🛠️ API Reference
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/auth/register` | ❌ | Register with email/password |
+| POST | `/api/auth/login` | ❌ | Login |
+| POST | `/api/auth/google` | ❌ | Google Sign-In via Firebase |
+| GET | `/api/auth/me` | ✅ | Get current user |
+| PUT | `/api/auth/complete-profile` | ✅ | Complete voter profile |
+| POST | `/api/chat` | ✅ | Send chat message |
+| GET | `/api/chat/:userId/history` | ✅ | Get chat history |
+| GET | `/api/journey/:userId` | ✅ | Get personalized journey |
+| GET | `/api/quiz` | ✅ | Get quiz questions |
+| POST | `/api/quiz/submit` | ✅ | Submit quiz answers |
+| GET | `/api/scenario/list` | ✅ | List available scenarios |
+| POST | `/api/scenario` | ✅ | Run scenario simulation |
+| POST | `/api/booth` | ✅ | Get booth guidance |
+| GET | `/api/checklist/:userId` | ✅ | Get user checklist |
+| PUT | `/api/checklist/:userId/toggle/:key` | ✅ | Toggle checklist item |
+| GET | `/api/analytics/insights/:userId` | ✅ | User analytics |
+| GET | `/api/health` | ❌ | System health check |
+
+---
+
 <p align="center">
   <strong>🇮🇳 Built with ❤️ for Indian Democracy</strong><br/>
   <em>Empowering every citizen to exercise their right to vote</em>

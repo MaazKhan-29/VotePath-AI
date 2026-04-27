@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const aiService = require('../services/aiService');
 const prompts = require('../services/promptService');
+const analyticsService = require('../services/analyticsService');
 const { asyncHandler } = require('../middleware/errorHandler');
 
 // GET /api/journey/:userId
@@ -11,7 +12,9 @@ const getJourney = asyncHandler(async (req, res) => {
   }
 
   const { system, prompt } = prompts.journey(user);
+  const startTime = Date.now();
   const result = await aiService.generate(prompt, system);
+  const responseTimeMs = Date.now() - startTime;
 
   let journeyData;
   try {
@@ -38,6 +41,13 @@ const getJourney = asyncHandler(async (req, res) => {
       nextAction: user.voterStatus !== 'registered' ? 'Start your voter registration at voters.eci.gov.in' : 'Verify your details in the electoral roll',
     };
   }
+
+  // Log interaction for analytics
+  analyticsService.logQuery({
+    userId: req.params.userId, query: 'journey_generation',
+    response: journeyData.summary || '', provider: result.provider,
+    endpoint: 'journey', responseTimeMs, cached: result.cached || false,
+  });
 
   res.json({
     success: true,

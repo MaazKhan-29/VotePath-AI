@@ -2,6 +2,7 @@ const User = require('../models/User');
 const ChatHistory = require('../models/ChatHistory');
 const aiService = require('../services/aiService');
 const prompts = require('../services/promptService');
+const analyticsService = require('../services/analyticsService');
 const { asyncHandler } = require('../middleware/errorHandler');
 
 // POST /api/chat
@@ -26,9 +27,11 @@ const chat = asyncHandler(async (req, res) => {
   // Add user message
   chatHistory.messages.push({ role: 'user', content: message });
 
-  // Generate AI response (don't cache chat messages)
+  // Generate AI response with timing (don't cache chat messages)
+  const startTime = Date.now();
   const { system, prompt } = prompts.chat(message, user, chatHistory.messages);
   const result = await aiService.generate(prompt, system, false);
+  const responseTimeMs = Date.now() - startTime;
 
   // Add assistant response
   chatHistory.messages.push({ role: 'assistant', content: result.content });
@@ -39,6 +42,13 @@ const chat = asyncHandler(async (req, res) => {
   }
 
   await chatHistory.save();
+
+  // Log interaction for analytics (non-blocking)
+  analyticsService.logQuery({
+    userId, query: message, response: result.content,
+    provider: result.provider, endpoint: 'chat',
+    responseTimeMs, cached: result.cached || false,
+  });
 
   res.json({
     success: true,

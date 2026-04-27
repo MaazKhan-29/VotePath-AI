@@ -11,7 +11,9 @@ STRICT RULES:
 5. Always end with "What should you do next?" followed by a clear next action.
 6. Be encouraging and supportive about civic participation.
 7. Focus on WHAT the user should DO, not just information.
-8. Keep responses concise but complete.`;
+8. Keep responses concise but complete.
+9. When generating JSON, include a "reasoning" field explaining WHY this recommendation is personalized.
+10. Include a "confidenceScore" (0-100) indicating how confident you are in the recommendation.`;
 
 const prompts = {
   journey: (user) => ({
@@ -44,7 +46,9 @@ Format your response as JSON:
     }
   ],
   "summary": "One line summary of the journey",
-  "nextAction": "What the user should do right now"
+  "nextAction": "What the user should do right now",
+  "reasoning": "Why this journey was personalized this way for the user",
+  "confidenceScore": 85
 }`,
   }),
 

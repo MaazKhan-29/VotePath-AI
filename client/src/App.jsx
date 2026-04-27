@@ -25,9 +25,9 @@ const TranslatorPage = lazy(() => import('./pages/TranslatorPage'));
 // ── Premium Loading Spinner ──
 function LoadingScreen({ text = 'Loading' }) {
   return (
-    <div className="min-h-screen bg-bg-dark flex items-center justify-center">
+    <div className="min-h-screen bg-bg-dark flex items-center justify-center" role="status" aria-live="polite" aria-busy="true">
       <div className="text-center">
-        <div className="relative w-14 h-14 mx-auto mb-5">
+        <div className="relative w-14 h-14 mx-auto mb-5" aria-hidden="true">
           {/* Outer ring */}
           <div className="absolute inset-0 rounded-2xl border-2 border-primary/20 animate-pulse" />
           {/* Spinning ring */}
@@ -38,11 +38,12 @@ function LoadingScreen({ text = 'Loading' }) {
           </div>
         </div>
         <p className="text-text-muted text-sm font-medium">{text}</p>
-        <div className="flex items-center justify-center gap-1 mt-2">
+        <div className="flex items-center justify-center gap-1 mt-2" aria-hidden="true">
           <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
           <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
           <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
         </div>
+        <span className="sr-only">{text}, please wait...</span>
       </div>
     </div>
   );

@@ -89,7 +89,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-dark relative overflow-hidden flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-bg-dark relative overflow-hidden flex items-center justify-center px-4 py-8" role="main" id="main-content">
       {/* Background Effects */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-[-30%] right-[-10%] w-[600px] h-[600px] rounded-full bg-primary/8 blur-[120px]" />
@@ -115,9 +115,12 @@ export default function AuthPage() {
 
           <div className="p-7">
             {/* Tab Switcher */}
-            <div className="flex rounded-xl bg-bg-elevated p-1 mb-6">
+            <div className="flex rounded-xl bg-bg-elevated p-1 mb-6" role="tablist" aria-label="Authentication mode">
               {['login', 'register'].map((tab) => (
                 <button key={tab} onClick={() => setMode(tab)}
+                  role="tab"
+                  aria-selected={mode === tab}
+                  aria-controls="auth-form"
                   className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all ${mode === tab
                       ? 'bg-primary text-white shadow-md shadow-primary/20'
                       : 'text-text-muted hover:text-text-primary'
@@ -164,43 +167,50 @@ export default function AuthPage() {
             </div>
 
             {/* Email/Password Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" id="auth-form" aria-label={mode === 'login' ? 'Sign in form' : 'Registration form'}>
               <AnimatePresence mode="wait">
                 {mode === 'register' && (
                   <motion.div key="name-field"
                     initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }}>
-                    <label className="block text-xs text-text-secondary mb-1.5 font-medium">
+                    <label htmlFor="auth-name" className="block text-xs text-text-secondary mb-1.5 font-medium">
                       <FiUser className="inline mr-1" size={12} /> Full Name
                     </label>
-                    <input type="text" className="input-field" placeholder="Enter your full name"
-                      value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+                    <input id="auth-name" type="text" className="input-field" placeholder="Enter your full name"
+                      value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
+                      aria-required="true" autoComplete="name" />
                   </motion.div>
                 )}
               </AnimatePresence>
 
               <div>
-                <label className="block text-xs text-text-secondary mb-1.5 font-medium">
+                <label htmlFor="auth-email" className="block text-xs text-text-secondary mb-1.5 font-medium">
                   <FiMail className="inline mr-1" size={12} /> Email Address
                 </label>
-                <input type="email" className="input-field" placeholder="you@example.com"
-                  value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
+                <input id="auth-email" type="email" className="input-field" placeholder="you@example.com"
+                  value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
+                  aria-required="true" autoComplete="email" />
               </div>
 
               <div>
-                <label className="block text-xs text-text-secondary mb-1.5 font-medium">
+                <label htmlFor="auth-password" className="block text-xs text-text-secondary mb-1.5 font-medium">
                   <FiLock className="inline mr-1" size={12} /> Password
                 </label>
                 <div className="relative">
-                  <input type={showPw ? 'text' : 'password'} className="input-field pr-10"
+                  <input id="auth-password" type={showPw ? 'text' : 'password'} className="input-field pr-10"
                     placeholder={mode === 'register' ? 'Min 6 characters' : 'Enter password'}
                     value={form.password}
-                    onChange={e => setForm({ ...form, password: e.target.value })} />
+                    onChange={e => setForm({ ...form, password: e.target.value })}
+                    aria-required="true"
+                    aria-describedby={mode === 'register' ? 'password-hint' : undefined}
+                    autoComplete={mode === 'register' ? 'new-password' : 'current-password'} />
                   <button type="button" onClick={() => setShowPw(!showPw)}
+                    aria-label={showPw ? 'Hide password' : 'Show password'}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors">
                     {showPw ? <FiEyeOff size={16} /> : <FiEye size={16} />}
                   </button>
                 </div>
+                {mode === 'register' && <p id="password-hint" className="sr-only">Password must be at least 6 characters</p>}
               </div>
 
               <motion.button type="submit" disabled={loading}

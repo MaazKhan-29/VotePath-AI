@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const aiService = require('../services/aiService');
 const prompts = require('../services/promptService');
+const analyticsService = require('../services/analyticsService');
 const { asyncHandler } = require('../middleware/errorHandler');
 
 const runScenario = asyncHandler(async (req, res) => {
@@ -13,7 +14,9 @@ const runScenario = asyncHandler(async (req, res) => {
   if (!user) return res.status(404).json({ success: false, error: 'User not found' });
 
   const { system, prompt } = prompts.scenario(scenarioType, user);
+  const startTime = Date.now();
   const result = await aiService.generate(prompt, system);
+  const responseTimeMs = Date.now() - startTime;
 
   let scenarioData;
   try {
@@ -24,6 +27,13 @@ const runScenario = asyncHandler(async (req, res) => {
   if (!scenarioData) {
     scenarioData = FALLBACK_SCENARIOS[scenarioType] || FALLBACK_SCENARIOS.first_time_voter;
   }
+
+  // Log interaction for analytics
+  analyticsService.logQuery({
+    userId, query: scenarioType, response: scenarioData.title || '',
+    provider: result.provider, endpoint: 'scenario',
+    responseTimeMs, cached: result.cached || false,
+  });
 
   res.json({ success: true, data: scenarioData, provider: result.provider, cached: result.cached });
 });

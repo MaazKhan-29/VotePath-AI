@@ -131,7 +131,7 @@ export default function ChatPage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-      className="h-[calc(100vh-8rem)]">
+      className="h-[calc(100vh-8rem)]" role="main" id="main-content" aria-label="AI Chat Assistant">
 
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
@@ -149,7 +149,8 @@ export default function ChatPage() {
               ? 'bg-primary/15 border-primary/30 text-primary'
               : 'bg-bg-elevated border-border text-text-muted hover:text-text-primary'
             }`}
-          title={voiceOn ? 'Disable Voice' : 'Enable Voice'}>
+          aria-label={voiceOn ? 'Disable voice reading' : 'Enable voice reading'}
+          aria-pressed={voiceOn}>
           {voiceOn ? <FiVolume2 size={16} /> : <FiVolumeX size={16} />}
         </button>
       </div>
@@ -162,7 +163,7 @@ export default function ChatPage() {
           <div className="h-0.5 bg-gradient-to-r from-primary via-secondary to-primary-glow" />
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-4 chat-scroll-hide">
+          <div className="flex-1 overflow-y-auto p-5 space-y-4 chat-scroll-hide" role="log" aria-live="polite" aria-label="Chat messages">
             <AnimatePresence>
               {messages.map((msg, i) => (
                 <motion.div key={i}
@@ -183,16 +184,17 @@ export default function ChatPage() {
             </AnimatePresence>
 
             {sending && (
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center flex-shrink-0 text-sm">
+              <div className="flex gap-3" role="status" aria-label="AI is thinking">
+                <div className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center flex-shrink-0 text-sm" aria-hidden="true">
                   🤖
                 </div>
                 <div className="chat-bubble-assistant">
-                  <div className="flex gap-1.5 py-1">
+                  <div className="flex gap-1.5 py-1" aria-hidden="true">
                     <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
                     <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
+                  <span className="sr-only">AI is thinking, please wait...</span>
                 </div>
               </div>
             )}
@@ -201,15 +203,18 @@ export default function ChatPage() {
 
           {/* Input Bar */}
           <div className="p-4 border-t border-border bg-bg-card/50">
-            <div className="flex gap-2 items-center">
-              <input ref={inputRef} type="text" value={input}
+            <label htmlFor="chat-input" className="sr-only">Type your election question</label>
+            <div className="flex gap-2 items-center" role="search">
+              <input ref={inputRef} id="chat-input" type="text" value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSend()}
                 disabled={sending}
                 className="input-field flex-1 text-sm"
-                placeholder="Ask about elections | चुनाव के बारे में पूछें" />
+                placeholder="Ask about elections | चुनाव के बारे में पूछें"
+                aria-label="Type your election question" />
               <motion.button onClick={() => handleSend()} disabled={sending || !input.trim()}
                 whileTap={{ scale: 0.9 }}
+                aria-label="Send message"
                 className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity hover:shadow-xl">
                 <FiSend size={16} />
               </motion.button>
@@ -218,7 +223,7 @@ export default function ChatPage() {
         </div>
 
         {/* ===== SIDEBAR ===== */}
-        <div className="hidden lg:flex flex-col gap-4 overflow-y-auto">
+        <aside className="hidden lg:flex flex-col gap-4 overflow-y-auto" aria-label="Chat sidebar">
 
           {/* Quick Questions */}
           <div className="glass-card-static p-4">
@@ -285,7 +290,7 @@ export default function ChatPage() {
             </div>
             <FiExternalLink size={12} className="text-text-muted group-hover:text-primary" />
           </a>
-        </div>
+        </aside>
       </div>
     </motion.div>
   );
