@@ -17,7 +17,7 @@ const queryLogSchema = new mongoose.Schema({
   },
   provider: {
     type: String,
-    enum: ['gemini', 'cache', 'fallback'],
+    enum: ['gemini', 'mistral', 'cache', 'fallback'],
     default: 'gemini',
   },
   endpoint: {

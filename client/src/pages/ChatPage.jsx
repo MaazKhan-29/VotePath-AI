@@ -99,33 +99,45 @@ export default function ChatPage() {
     handleSend(q);
   };
 
-  // Simple markdown-like rendering
+  // Clean markdown rendering — strips asterisks, renders headings, bullets
   const renderContent = (text) => {
-    return text.split('\n').map((line, i) => {
-      // Bold
-      let parts = line.split(/(\*\*[^*]+\*\*)/g).map((part, j) => {
-        if (part.startsWith('**') && part.endsWith('**')) {
-          return <strong key={j} className="text-text-primary font-semibold">{part.slice(2, -2)}</strong>;
-        }
-        return part;
-      });
+    // Pre-process: strip all asterisks from the entire text
+    const cleaned = text
+      // Convert **Heading** on its own line → ## Heading
+      .replace(/^\*\*(.+?)\*\*\s*$/gm, '## $1')
+      // Remove all remaining ** bold markers
+      .replace(/\*\*(.+?)\*\*/g, '$1')
+      // Remove all single * italic markers (but not bullet •)
+      .replace(/\*([^*\n]+)\*/g, '$1')
+      // Convert * list items → • bullets
+      .replace(/^\*\s+/gm, '• ')
+      // Final cleanup: remove any stray asterisks
+      .replace(/\*\*/g, '');
+
+    return cleaned.split('\n').map((line, i) => {
+      // Headers (## or ###)
+      if (line.startsWith('### ')) {
+        return <h4 key={i} className="text-sm font-bold text-primary mt-2 mb-1">{line.replace('### ', '')}</h4>;
+      }
+      if (line.startsWith('## ')) {
+        return <h3 key={i} className="text-base font-bold text-primary mt-2 mb-1">{line.replace('## ', '')}</h3>;
+      }
 
       // Bullet points
       if (line.startsWith('• ') || line.startsWith('- ')) {
         return (
           <div key={i} className="flex gap-2 ml-1">
             <span className="text-primary mt-0.5">•</span>
-            <span>{parts.slice(0).map((p, k) => typeof p === 'string' ? p.replace(/^[•-]\s*/, '') : p)}</span>
+            <span>{line.replace(/^[•\-]\s*/, '')}</span>
           </div>
         );
       }
 
-      // Headers
-      if (line.startsWith('## ')) {
-        return <h3 key={i} className="text-base font-bold text-primary mt-2 mb-1">{line.replace('## ', '')}</h3>;
-      }
+      // Empty line = spacer
+      if (line.trim() === '') return <p key={i} className="h-2" />;
 
-      return <p key={i} className={line === '' ? 'h-2' : ''}>{parts}</p>;
+      // Normal paragraph
+      return <p key={i}>{line}</p>;
     });
   };
 

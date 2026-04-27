@@ -33,6 +33,19 @@ jest.mock('../config/firebase', () => {
   return mockAdmin;
 });
 
+// Mock Mistral service to avoid hitting real API during tests
+jest.mock('../services/mistralService', () => {
+  const mockInstance = {
+    isAvailable: jest.fn().mockReturnValue(false), // Disabled by default in tests
+    generate: jest.fn().mockResolvedValue({
+      content: 'Mistral mock response',
+      provider: 'mistral',
+      model: 'mistral-small-latest',
+    }),
+  };
+  return mockInstance;
+});
+
 // Connect to in-memory MongoDB
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');

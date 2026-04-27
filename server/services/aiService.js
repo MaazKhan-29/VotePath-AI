@@ -1,87 +1,227 @@
 const geminiService = require('./geminiService');
+const mistralService = require('./mistralService');
 const cacheService = require('./cacheService');
 
 class AIService {
   constructor() {
     this.currentProvider = null;
     this.geminiAvailable = false;
+    this.mistralAvailable = false;
     this.lastHealthCheck = 0;
-    this.healthCheckInterval = 30000; // 30 seconds
+    this.healthCheckInterval = 30000;
+
+    // Provider cooldown tracking (skip failed providers temporarily)
+    this.providerCooldowns = new Map();
+    this.cooldownDuration = 60000; // 1 minute cooldown after failure
+
+    // Response time tracking (for smart provider selection)
+    this.responseTimesGemini = [];
+    this.responseTimesMistral = [];
+    this.maxTrackedTimes = 10;
+
+    // Stats
+    this.stats = {
+      totalRequests: 0,
+      cacheHits: 0,
+      geminiSuccess: 0,
+      geminiFailures: 0,
+      mistralSuccess: 0,
+      mistralFailures: 0,
+      fallbackUsed: 0,
+    };
   }
 
+  // ── Health Check ────────────────────────────────────────────
   async checkHealth() {
     const now = Date.now();
     if (now - this.lastHealthCheck < this.healthCheckInterval) {
       return {
         gemini: this.geminiAvailable,
+        mistral: this.mistralAvailable,
         activeProvider: this.currentProvider,
+        stats: this.stats,
       };
     }
 
     this.geminiAvailable = geminiService.isAvailable();
+    this.mistralAvailable = mistralService.isAvailable();
     this.lastHealthCheck = now;
 
-    if (this.geminiAvailable) {
-      this.currentProvider = 'gemini';
-    } else {
-      this.currentProvider = null;
+    // Clear expired cooldowns
+    for (const [provider, expiry] of this.providerCooldowns) {
+      if (now >= expiry) this.providerCooldowns.delete(provider);
     }
+
+    this.currentProvider = this.geminiAvailable ? 'gemini'
+      : this.mistralAvailable ? 'mistral'
+      : null;
 
     return {
       gemini: this.geminiAvailable,
+      mistral: this.mistralAvailable,
       activeProvider: this.currentProvider,
+      stats: this.stats,
+      avgResponseTime: {
+        gemini: this._getAvgResponseTime('gemini'),
+        mistral: this._getAvgResponseTime('mistral'),
+      },
     };
   }
 
+  // ── Main Generate Method ────────────────────────────────────
   async generate(prompt, systemPrompt = '', useCache = true) {
+    this.stats.totalRequests++;
+
     // Step 1: Check cache
     if (useCache) {
       const hash = cacheService.generateHash(prompt, systemPrompt);
       const cached = await cacheService.get(hash);
       if (cached) {
-        console.log('📦 Cache hit for prompt');
+        this.stats.cacheHits++;
         return {
-          content: cached.response,
+          content: this._cleanResponse(cached.response),
           provider: 'cache',
           originalProvider: cached.provider,
           cached: true,
+          responseTime: 0,
         };
       }
     }
 
-    // Step 2: Try Gemini
-    try {
-      const health = await this.checkHealth();
+    // Step 2: Try Gemini (primary)
+    if (!this._isOnCooldown('gemini')) {
+      try {
+        const health = await this.checkHealth();
+        if (health.gemini) {
+          const result = await this._timedGenerate('gemini', prompt, systemPrompt);
 
-      if (health.gemini) {
-        console.log('☁️ Using Gemini...');
-        const result = await geminiService.generate(prompt, systemPrompt);
+          if (useCache) {
+            const hash = cacheService.generateHash(prompt, systemPrompt);
+            await cacheService.set(hash, result.content, 'gemini').catch(() => {});
+          }
 
-        // Cache successful response
-        if (useCache) {
-          const hash = cacheService.generateHash(prompt, systemPrompt);
-          await cacheService.set(hash, result.content, 'gemini');
+          this.stats.geminiSuccess++;
+          return { ...result, content: this._cleanResponse(result.content), cached: false };
         }
-
-        return { ...result, cached: false };
+      } catch (error) {
+        this.stats.geminiFailures++;
+        this._setCooldown('gemini', error);
+        console.error(`❌ Gemini failed (cooldown ${Math.round(this.cooldownDuration / 1000)}s):`, error.message);
       }
-    } catch (error) {
-      console.error('❌ Gemini failed:', error.message);
     }
 
-    // Step 3: Gemini failed — return fallback message
+    // Step 3: Try Mistral (fallback)
+    if (!this._isOnCooldown('mistral')) {
+      try {
+        if (mistralService.isAvailable()) {
+          console.log('🤖 Switching to Mistral AI...');
+          const result = await this._timedGenerate('mistral', prompt, systemPrompt);
+
+          if (useCache) {
+            const hash = cacheService.generateHash(prompt, systemPrompt);
+            await cacheService.set(hash, result.content, 'mistral').catch(() => {});
+          }
+
+          this.stats.mistralSuccess++;
+          return { ...result, content: this._cleanResponse(result.content), cached: false };
+        }
+      } catch (error) {
+        this.stats.mistralFailures++;
+        this._setCooldown('mistral', error);
+        console.error(`❌ Mistral failed:`, error.message);
+      }
+    }
+
+    // Step 4: All AI providers failed — hardcoded fallback
+    this.stats.fallbackUsed++;
+    console.warn('⚠️ All AI providers unavailable. Using hardcoded fallback.');
     return {
       content: this._getFallbackResponse(prompt),
       provider: 'fallback',
       cached: false,
-      error: 'Gemini AI is unavailable. Showing pre-built guidance.',
+      responseTime: 0,
+      error: 'All AI providers are unavailable. Showing pre-built guidance.',
     };
   }
 
+  // ── Clean AI Response — strip asterisks from all providers ──
+  _cleanResponse(text) {
+    if (!text || typeof text !== 'string') return text;
+
+    return text
+      // Convert **Heading** on its own line → ## Heading
+      .replace(/^\*\*(.+?)\*\*\s*$/gm, '## $1')
+      // Remove remaining inline ** bold markers
+      .replace(/\*\*(.+?)\*\*/g, '$1')
+      // Remove single * italic markers
+      .replace(/\*([^*\n]+)\*/g, '$1')
+      // Convert * list items → • bullet points
+      .replace(/^\*\s+/gm, '• ')
+      // Final cleanup: remove any stray double asterisks
+      .replace(/\*\*/g, '')
+      .trim();
+  }
+
+  // ── Timed Generate (tracks response time) ───────────────────
+  async _timedGenerate(provider, prompt, systemPrompt) {
+    const start = Date.now();
+    let result;
+
+    if (provider === 'gemini') {
+      result = await geminiService.generate(prompt, systemPrompt);
+    } else if (provider === 'mistral') {
+      result = await mistralService.generate(prompt, systemPrompt);
+    } else {
+      throw new Error(`Unknown provider: ${provider}`);
+    }
+
+    const responseTime = Date.now() - start;
+    this._trackResponseTime(provider, responseTime);
+
+    console.log(`✅ ${provider} responded in ${responseTime}ms`);
+    return { ...result, responseTime };
+  }
+
+  // ── Cooldown Management ─────────────────────────────────────
+  _isOnCooldown(provider) {
+    const expiry = this.providerCooldowns.get(provider);
+    if (!expiry) return false;
+    if (Date.now() >= expiry) {
+      this.providerCooldowns.delete(provider);
+      return false;
+    }
+    return true;
+  }
+
+  _setCooldown(provider, error) {
+    const msg = error.message || '';
+    // Longer cooldown for rate limits, shorter for transient errors
+    let duration = this.cooldownDuration;
+    if (msg.includes('429') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('quota')) {
+      duration = 120000; // 2 min for rate limits
+    } else if (msg.includes('401') || msg.includes('Invalid API key')) {
+      duration = 300000; // 5 min for auth errors
+    }
+    this.providerCooldowns.set(provider, Date.now() + duration);
+  }
+
+  // ── Response Time Tracking ──────────────────────────────────
+  _trackResponseTime(provider, ms) {
+    const arr = provider === 'gemini' ? this.responseTimesGemini : this.responseTimesMistral;
+    arr.push(ms);
+    if (arr.length > this.maxTrackedTimes) arr.shift();
+  }
+
+  _getAvgResponseTime(provider) {
+    const arr = provider === 'gemini' ? this.responseTimesGemini : this.responseTimesMistral;
+    if (arr.length === 0) return null;
+    return Math.round(arr.reduce((a, b) => a + b, 0) / arr.length);
+  }
+
+  // ── Hardcoded Fallback Responses ────────────────────────────
   _getFallbackResponse(prompt) {
     const lower = prompt.toLowerCase().trim();
 
-    // Detect greetings and casual/non-election messages
     const greetings = ['hi','hey','hello','namaste','hii','hiii','yo','sup','hola','ok','okay','thanks','thank you','haan','theek','fine','good','nice','cool','hmm','kya haal','kaise ho','how are you','what\'s up','wassup','hey there'];
     const isGreeting = greetings.some(g => lower === g || lower.startsWith(g + ' ') || lower.startsWith(g + ',') || lower.startsWith(g + '!'));
     const isShort = lower.length < 15 && !lower.includes('vote') && !lower.includes('register') && !lower.includes('booth') && !lower.includes('election') && !lower.includes('eci') && !lower.includes('voter') && !lower.includes('evm');
