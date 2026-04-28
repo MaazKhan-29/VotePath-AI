@@ -6,6 +6,7 @@ import {
   FiSend, FiVolume2, FiVolumeX, FiMessageCircle, FiBookOpen,
   FiHelpCircle, FiZap, FiExternalLink
 } from 'react-icons/fi';
+import { trackChatMessage } from '../utils/analytics';
 
 const QUICK_QUESTIONS = [
   { label: 'How to register?', q: 'How do I register as a voter in India?' },
@@ -89,6 +90,7 @@ export default function ChatPage() {
       if (data.success) {
         setMessages(prev => [...prev, { role: 'assistant', content: data.data.reply }]);
         speak(data.data.reply);
+        trackChatMessage(data.data.provider || 'unknown');
       }
     } catch {
       setMessages(prev => [...prev, {

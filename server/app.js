@@ -86,13 +86,24 @@ app.use('/api/booth', protect, aiLimiter, require('./routes/boothRoutes'));
 app.use('/api/translate', protect, aiLimiter, require('./routes/translateRoutes'));
 app.use('/api/analytics', protect, require('./routes/analyticsRoutes'));
 
-// Health check endpoint (public)
+// Health check endpoint (public) — reports all service statuses
 app.get('/api/health', async (req, res) => {
   const aiStatus = await aiService.getStatus();
+  const googleTranslateService = require('./services/googleTranslateService');
+  const googleNLPService = require('./services/googleNLPService');
+  const { firebaseInitialized } = require('./config/firebase');
+
   res.json({
     success: true,
     status: 'running',
     ai: aiStatus,
+    googleServices: {
+      geminiAI: aiStatus.gemini || false,
+      firebaseAuth: firebaseInitialized || false,
+      cloudTranslate: googleTranslateService.isAvailable(),
+      cloudNLP: googleNLPService.isAvailable(),
+      analytics: true, // gtag.js is always loaded on frontend
+    },
     security: {
       helmet: true,
       rateLimiting: true,

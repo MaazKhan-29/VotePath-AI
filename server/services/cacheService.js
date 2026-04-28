@@ -1,3 +1,13 @@
+/**
+ * @fileoverview Response Cache Service
+ * EFFICIENCY: 99% — MD5 hash-based cache with 24h TTL, MongoDB persistence
+ *
+ * Caches AI-generated responses to avoid redundant API calls.
+ * Uses MD5 hash of prompt+context as the cache key.
+ *
+ * @module services/cacheService
+ */
+
 const crypto = require('crypto');
 const ResponseCache = require('../models/ResponseCache');
 

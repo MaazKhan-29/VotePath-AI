@@ -6,6 +6,7 @@ import { auth, googleProvider, isFirebaseConfigured } from '../config/firebase';
 import { useUser } from '../context/UserContext';
 import { authRegister, authLogin, authGoogle } from '../services/api';
 import toast from 'react-hot-toast';
+import { trackLogin } from '../utils/analytics';
 import {
   FiMail, FiLock, FiUser, FiArrowRight, FiEye, FiEyeOff, FiShield
 } from 'react-icons/fi';
@@ -45,6 +46,7 @@ export default function AuthPage() {
 
       const { user, token } = res.data.data;
       loginUser(user, token);
+      trackLogin(mode === 'register' ? 'email_register' : 'email_login');
       navigate(user.profileCompleted ? '/dashboard' : '/setup');
     } catch (err) {
       toast.error(err.response?.data?.error || 'Authentication failed.');
@@ -71,6 +73,7 @@ export default function AuthPage() {
       const { user, token } = res.data.data;
       loginUser(user, token);
       toast.success(`Welcome, ${user.name}! 🎉`);
+      trackLogin('google');
       navigate(user.profileCompleted ? '/dashboard' : '/setup');
     } catch (err) {
       // Handle specific Firebase errors
